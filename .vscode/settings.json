@@ -5,7 +5,10 @@
     "**/.sfdx": true
   },
   "cSpell.words": [
-    "sfdx"
+    "occured",
+    "sfdx",
+    "Sobject",
+    "undelete"
   ],
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#ab307e",
