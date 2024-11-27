@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 11-25-2024
+ * @last modified on  : 11-27-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class TaskTriggerHandler {
@@ -17,4 +17,5 @@ public with sharing class TaskTriggerHandler {
             }
         }
     }
+    
 }
