@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 11-25-2024
+ * @last modified on  : 11-29-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class LeadTriggerDispatcher {
@@ -15,10 +15,10 @@ public with sharing class LeadTriggerDispatcher {
                 
             }
             When BEFORE_UPDATE {
-                    LeadTriggerHandler.handleBeforeUpdate(Trigger.new);
+                LeadTriggerHandler.handleBeforeUpdate(Trigger.new, (Map<Id, Lead>) Trigger.oldMap);
             }
             WHEN BEFORE_DELETE {
-    
+                LeadTriggerHandler.handleBeforeDelete(Trigger.old);
             }
             WHEN AFTER_INSERT {
             }

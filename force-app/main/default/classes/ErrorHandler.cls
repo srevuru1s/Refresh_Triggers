@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 11-27-2024
+ * @last modified on  : 11-30-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ErrorHandler {
@@ -11,14 +11,14 @@ public with sharing class ErrorHandler {
 
             try {
             insert as user listOfRecords;
-            
+            System.debug('Successfully Record got inserted');
             }
             catch(DmlException dmlError) {
-                
+                System.debug('Im into the DMl Exception');
                 exceptionHandler(dmlError);
             }
             catch(Exception error) {
-                
+                System.debug('Im into the Final Exception');
                 exceptionHandler(error);               
             }
     }    
@@ -49,7 +49,7 @@ public with sharing class ErrorHandler {
                     errorRecord.Error_Message__c         = dmlErrors.getMessage();
                     Exception causeOfException           = dmlErrors.getCause();
                     errorRecord.Error_Type__c            = dmlErrors.getTypeName();
-                    errorRecord.Stack_Trace_Message__c   = dmlErrors.getStackTraceString();
+                    errorRecord.Stack_Trace_Message__c   = dmlErrors.getStackTraceString().substring(0, 200);
                     errorRecord.Name                     = 'Error Record' + String.valueOf(i); 
 
                     listErrorRecords.add(errorRecord);
@@ -63,7 +63,7 @@ public with sharing class ErrorHandler {
                 errorRecord.Error_Message__c         = allErrors.getMessage();
                 Exception causeOfException           = allErrors.getCause();
                 errorRecord.Error_Type__c            = allErrors.getTypeName();
-                errorRecord.Stack_Trace_Message__c   = allErrors.getStackTraceString();
+                errorRecord.Stack_Trace_Message__c   = allErrors.getStackTraceString().trim();
                 errorRecord.Name                     = 'Error Record' + String.valueOf(i); 
 
                 listErrorRecords.add(errorRecord);

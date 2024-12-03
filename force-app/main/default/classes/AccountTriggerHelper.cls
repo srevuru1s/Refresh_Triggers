@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 11-26-2024
+ * @last modified on  : 11-29-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class AccountTriggerHelper {
@@ -64,5 +64,105 @@ public with sharing class AccountTriggerHelper {
 
                 ErrorHandler.handleUpdateExceptions(contactsToUpdate);
             }
+        }
+    //* Method to create N contacts for each account AFTER UPDATE
+        public static void updatedContactNumber (List<Account> newAccounts, Map<Id, Account> oldAccounts) {
+            //* Updated new map of contacts
+            Map<Id,Account> newUpdatedContacts = new Map<Id,Account>();
+            Map<Id, Account> deleteNContact = new Map<Id, Account>();
+
+            if (newAccounts?.size() > 0) {
+                for (Account accountRecord : newAccounts) {
+
+                    if (accountRecord.Create_N_Contacts__c != null && accountRecord.Create_N_Contacts__c != oldAccounts.get(accountRecord.id).Create_N_Contacts__c) {
+
+                        //* check the new value is greater than the old one
+                        if (accountRecord.Create_N_Contacts__c > oldAccounts.get(accountRecord.Id).Create_N_Contacts__c) {
+
+                            //* create N difference contacts
+                            Account newAccount  = new Account();
+                            newAccount.Id       = accountRecord.Id;
+                            newAccount.Industry = accountRecord.Industry;
+                            newAccount.Name     = accountRecord.Name;
+                            newAccount.Create_N_Contacts__c = accountRecord.Create_N_Contacts__c - oldAccounts.get(accountRecord.Id).Create_N_Contacts__c;
+                            
+                            newUpdatedContacts.put(newAccount.Id, newAccount);
+                            
+                        } else {
+                            
+                            //* delete N contacts
+                            Account newAccount  = new Account();
+                            newAccount.Id       = accountRecord.Id;
+                            newAccount.Create_N_Contacts__c = oldAccounts.get(accountRecord.Id).Create_N_Contacts__c - accountRecord.Create_N_Contacts__c;
+                            
+                            deleteNContact.put(newAccount.Id, newAccount);
+                        }
+                    }
+                }
+            }
+
+            //* for creating new contacts 
+                if (newUpdatedContacts?.size() > 0) {
+                    createNContacts(newUpdatedContacts.values());
+                }
+        }    
+    //* Method to create N number of contact records
+        public static void createNContacts(List<Account> newAccounts) {
+
+            //* Map Account and number of contacts to be created
+                Map<Id, Account> numberOfContactsToBeCreated = new Map<Id, Account>();
+            //* List of number of contacts to be created
+                List<Contact> listContacts = new List<Contact>();
+            
+                if (newAccounts.size() > 0) {
+                
+                    for (Account accountRecord : newAccounts) {
+
+                        if (accountRecord?.Create_N_Contacts__c > 0 && accountRecord.Create_N_Contacts__c != null) {
+                            
+                            numberOfContactsToBeCreated.put(accountRecord.Id, accountRecord);
+                            
+                        }
+                    }
+                }
+            //* iterate over the number of contacts record
+            
+                if (numberOfContactsToBeCreated.size() > 0) {
+                    for (Id accountId : numberOfContactsToBeCreated.keySet()) {
+
+                        for (Integer i = 0; i < numberOfContactsToBeCreated.get(accountId).Create_N_Contacts__c; i++) {
+
+                            Contact contactRecord   = new Contact();
+                            contactRecord.AccountId = accountId;
+                            contactRecord.FirstName = numberOfContactsToBeCreated.get(accountId).Name + ' Contact ' + i;
+                            contactRecord.LastName  = numberOfContactsToBeCreated.get(accountId).Industry + 'Contact ' + i;
+                            listContacts.add(contactRecord);
+                        }
+                    }
+                }
+            //* Insert the list of contacts
+            
+                if (listContacts.size() > 0) {
+                    ErrorHandler.handleInsertExceptions(listContacts);
+                }
+        }    
+    //! Method to delete contacts from account
+        public static void deleteNContactsFromAccount(Map<Id,Account> mapAccounts) {
+            Map<Id, List<Contact>> mapOfContactsList = new Map<Id, List<Contact>>();
+
+            if (mapAccounts?.size() > 0) {
+
+                List<Contact> listOfContactsToDelete = [SELECT Id FROM Contact WHERE AccountId IN: mapAccounts.keySet() WITH USER_MODE];
+
+                for (Contact contactRecord : listOfContactsToDelete) {
+                    
+                    if (!mapOfContactsList.containsKey(contactRecord.AccountId)) {
+                        mapOfContactsList.put(contactRecord.AccountId, new List<Contact>());
+                    }
+
+                    mapOfContactsList.get(contactRecord.AccountId).add(contactRecord);
+                }
+            }
+
         }
 }

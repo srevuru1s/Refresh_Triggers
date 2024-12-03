@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 11-26-2024
+ * @last modified on  : 11-27-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class AccountTriggerDispatcher {
@@ -20,7 +20,7 @@ public with sharing class AccountTriggerDispatcher {
             
             }
             When AFTER_INSERT {
-        
+                AccountTriggerHandler.handleAfterInsert(Trigger.new, (Map<Id, Account>)Trigger.newMap);
             }
             When AFTER_UPDATE {
                 AccountTriggerHandler.handleAfterUpdate(Trigger.new, (Map<Id, Account>) Trigger.newMap, (Map<Id, Account>) Trigger.oldMap);

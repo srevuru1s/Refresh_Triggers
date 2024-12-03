@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 11-27-2024
+ * @last modified on  : 12-01-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class OpportunityTriggerHandler {
@@ -12,6 +12,11 @@ public with sharing class OpportunityTriggerHandler {
     public static void handleBeforeUpdate(List<Opportunity> newOpportunities, Map<Id, Opportunity> oldMapOpportunities) {
 
         OpportunityTriggerHelper.updateTriggerAmount(newOpportunities, oldMapOpportunities);
+    }
+    //* Handle After Delete
+
+    public static void handleAfterDelete(List<Opportunity> oldOpportunities, Map<Id, Opportunity> oldMapOpportunities) {
+        OpportunityTriggerHelper.createTaskToOpportunityOwner(oldOpportunities, oldMapOpportunities);
     }
     //* Handle After Update
     
@@ -42,6 +47,29 @@ public with sharing class OpportunityTriggerHandler {
                 
                 ErrorHandler.handleInsertExceptions(newTasksForOpportunity);
             }    
+        }
+    }
+
+    //* Handle Before Delete
+    public static void handleBeforeDelete(List<Opportunity> oldOpportunities, Map<Id,Opportunity> oldMapOpportunities) {
+
+        //* Testing the Trigger.old variables
+        Set<Id> accountId = new Set<Id>();
+
+        if (oldOpportunities?.size() > 0) {
+            
+            for (Opportunity opportunityRecord : oldOpportunities) {
+                accountId.add(opportunityRecord.AccountId);
+            }
+            
+            for (Account accountRecord : [SELECT Id, OwnerId FROM Account WHERE Id IN :accountId]) {
+
+                System.debug('I have found the account owner :' + accountRecord.OwnerId);
+            }
+
+            List<Opportunity> oppList = [SELECT Id, Name FROM Opportunity WHERE Id IN : oldOpportunities];
+            System.debug('Query from the old opps :' + oppList.size());
+            
         }
     }
 }
