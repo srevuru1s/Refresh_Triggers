@@ -7,18 +7,18 @@
 **/
 public with sharing class OpportunityTriggerHelper {
 
-    //* Update the trigger Amount field
+         //* Update the trigger Amount field
         public static void updateTriggerAmount(List<Opportunity> newOpportunities, Map<Id, Opportunity> oldMapOpportunities) {
-            
+                
             if (newOpportunities?.size() > 0) {
 
                 for (Opportunity opportunityRecord : newOpportunities) {
-                    //* condition to check the opp stage is Modified
-                    if (opportunityRecord.StageName != oldMapOpportunities.get(opportunityRecord.Id).StageName) {
-                        opportunityRecord.Amount  = (opportunityRecord.Probability * opportunityRecord.ExpectedRevenue);
-                        opportunityRecord.Description = 'Updated From Trigger';
-                        
-                    }
+                        //* condition to check the opp stage is Modified
+                        if (opportunityRecord.StageName != oldMapOpportunities.get(opportunityRecord.Id).StageName) {
+                            opportunityRecord.Amount  = (opportunityRecord.Probability * opportunityRecord.ExpectedRevenue);
+                            opportunityRecord.Description = 'Updated From Trigger';
+                            
+                        }
                 }
             }
         }
@@ -26,39 +26,64 @@ public with sharing class OpportunityTriggerHelper {
         //* Create a Task to Opportunity Account's owner when opp gets deleted'
         public static void createTaskToOpportunityOwner(List<Opportunity> oldOpportunities, Map<Id, Opportunity> oldMapOpportunities) {
 
-            List<Task> newTaskForAccountOwner = new List<Task>();
-            Map<Id,Opportunity> mapAccountIdOpportunity = new Map<Id,Opportunity>();
+                List<Task> newTaskForAccountOwner = new List<Task>();
+                Map<Id,Opportunity> mapAccountIdOpportunity = new Map<Id,Opportunity>();
+                
+                //* fetch the Account Owner Details 
+                for (Opportunity opportunityRecord : oldOpportunities) {
+                    mapAccountIdOpportunity.put(opportunityRecord.AccountId, opportunityRecord);
+                }
 
-            //* fetch the Account Owner Details 
-            for (Opportunity opportunityRecord : oldOpportunities) {
-                mapAccountIdOpportunity.put(opportunityRecord.AccountId, opportunityRecord);
-            }
+                //* Fetch the Opportunity Accounts owner Id
+                Map<Id,Account> opportunityAccountDetails = new Map<Id, Account> ([SELECT Id, OwnerId FROM Account WHERE Id IN: mapAccountIdOpportunity.keySet()]);
+                
+                if (oldOpportunities?.size() > 0) {
 
-            //* Fetch the Opportunity Accounts owner Id
-            Map<Id,Account> opportunityAccountDetails = new Map<Id, Account> ([SELECT Id, OwnerId FROM Account WHERE Id IN: mapAccountIdOpportunity.keySet()]);
+                    for (Opportunity oldOpportunity : oldOpportunities) {
+                        if (oldOpportunity.AccountId != null) {
+                            
+                            Task newTask = new Task();
+                            newTask.OwnerId      = opportunityAccountDetails.get(oldOpportunity.AccountId).OwnerId;
+                            newTask.Subject      = 'Created using Apex Trigger';
+                            newTask.ActivityDate = System.today();
+                            newTask.Description  = 'Opportunity was deleted';
+                            newTask.Status       = 'Not Started';
+                            newTask.Priority     = 'New';
+                            newTask.WhatId       = oldOpportunity.AccountId;
             
-            if (oldOpportunities?.size() > 0) {
+                            newTaskForAccountOwner.add(newTask);
+                        }
+                    }
+                }
 
-                for (Opportunity oldOpportunity : oldOpportunities) {
-                    if (oldOpportunity.AccountId != null) {
-                        
-                        Task newTask = new Task();
-                        newTask.OwnerId      = opportunityAccountDetails.get(oldOpportunity.AccountId).OwnerId;
-                        newTask.Subject      = 'Created using Apex Trigger';
-                        newTask.ActivityDate = System.today();
-                        newTask.Description  = 'Opportunity was deleted';
-                        newTask.Status       = 'Not Started';
-                        newTask.Priority     = 'New';
-                        newTask.WhatId       = oldOpportunity.AccountId;
-        
-                        newTaskForAccountOwner.add(newTask);
+                if (newTaskForAccountOwner?.size() > 0) {
+                    
+                    ErrorHandler.handleInsertExceptions(newTaskForAccountOwner);
+                }
+        }
+
+        //* Remove Opportunity Team Members when Opportunity is set to closed lost
+        public static void removeOpportnityTeam(List<Opportunity> newOpportunities, Map<Id,Opportunity> oldMapOpportunities) {
+            Map<Id,Opportunity> mapClosedLostOpportunities = new Map<Id,Opportunity>();
+
+            if (newOpportunities?.size() > 0) {
+
+                for (Opportunity opportunityRecord : newOpportunities) {
+                    if (opportunityRecord.StageName == 'Closed Lost') {
+                        mapClosedLostOpportunities.put(opportunityRecord.Id, opportunityRecord);
                     }
                 }
             }
 
-            if (newTaskForAccountOwner?.size() > 0) {
+            if (mapClosedLostOpportunities?.size() > 0) {
+                //Query the opp team records
+                Map<Id,OpportunityTeamMember> mapOppTeamMembers = new Map<Id,OpportunityTeamMember>([SELECT Id FROM OpportunityTeamMember WHERE OpportunityId IN :mapClosedLostOpportunities.keySet() WITH USER_MODE LIMIT 50000]);
                 
-                ErrorHandler.handleInsertExceptions(newTaskForAccountOwner);
+                if (mapOppTeamMembers?.size() > 0) {
+
+                    delete as user mapOppTeamMembers.values();
+                }
             }
         }
+
 }

@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-01-2024
+ * @last modified on  : 12-03-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class OpportunityTriggerHandler {
@@ -21,7 +21,7 @@ public with sharing class OpportunityTriggerHandler {
     //* Handle After Update
     
     //!When Opp is closed won, create a Task for the Opp owner 
-    public static void handleAfterUpdate(List<Opportunity> newOpportunities) {
+    public static void handleAfterUpdate(List<Opportunity> newOpportunities, Map<Id,Opportunity> oldMapOpportunities) {
         
         List<Task> newTasksForOpportunity = new List<Task>();
 
@@ -48,6 +48,9 @@ public with sharing class OpportunityTriggerHandler {
                 ErrorHandler.handleInsertExceptions(newTasksForOpportunity);
             }    
         }
+
+        //* Remove Opportunity Team Members
+        OpportunityTriggerHelper.removeOpportnityTeam(newOpportunities,oldMapOpportunities);
     }
 
     //* Handle Before Delete
@@ -72,4 +75,5 @@ public with sharing class OpportunityTriggerHandler {
             
         }
     }
+
 }
