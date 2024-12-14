@@ -1,0 +1,22 @@
+<!--
+  @description       : 
+  @author            : sagar@salesforce.learning
+  @group             : 
+  @last modified on  : 12-11-2024
+  @last modified by  : sagar@salesforce.learning
+-->
+<template>
+    <lightning-card  variant="Narrow"  title="Hello" icon-name="standard:account">
+        <lightning-button variant="brand" label="Show Accounts" title="Display Account Records" onclick={handleClick}></lightning-button>
+        <template lwc:if={showData}>
+            <lightning-datatable
+            key-field="id"
+            data={data}
+            columns={columns}
+        ></lightning-datatable>
+        </template>
+        
+
+    </lightning-card>
+    
+</template>

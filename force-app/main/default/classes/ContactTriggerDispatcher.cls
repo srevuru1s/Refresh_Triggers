@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-03-2024
+ * @last modified on  : 12-07-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ContactTriggerDispatcher {
@@ -22,7 +22,7 @@ public with sharing class ContactTriggerDispatcher {
                 
             }
             WHEN AFTER_INSERT {
-                
+                ContactTriggerHandler.handleAfterInsert(Trigger.new, (Map<Id,Contact>)Trigger.newMap);
             }
             WHEN AFTER_UPDATE {
                 

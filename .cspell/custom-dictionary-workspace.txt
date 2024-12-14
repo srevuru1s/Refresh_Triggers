@@ -1,4 +1,7 @@
 # Custom Dictionary Words
 Contcats
+datatable
+retieve
+slds
 Updateduplicate
 updateTriggerAmount

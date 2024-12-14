@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-03-2024
+ * @last modified on  : 12-09-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class OpportunityTriggerHelper {
@@ -81,9 +81,37 @@ public with sharing class OpportunityTriggerHelper {
                 
                 if (mapOppTeamMembers?.size() > 0) {
 
-                    delete as user mapOppTeamMembers.values();
+                    ErrorHandler.handleDeleteExceptions(mapOppTeamMembers.values());
                 }
             }
+        }
+
+        //* Add the Opportunity Teams when Opp updates to Needs Analysis
+        public static void addOpportunityTeamMembers(List<Opportunity> newOpportunity) {
+            
+            List<OpportunityTeamMember> listNewTeamMembers = new List<OpportunityTeamMember>();
+
+            if (newOpportunity?.size() > 0) {
+                //* check for the condition 
+                for (Opportunity newRecordOpportunity : newOpportunity) {
+                    if (newRecordOpportunity.StageName == 'Needs Analysis') {
+                        
+                        OpportunityTeamMember newTeamMembers  = new OpportunityTeamMember();
+                        newTeamMembers.OpportunityId          = newRecordOpportunity.Id;
+                        newTeamMembers.TeamMemberRole         = 'Account Manager';
+                        newTeamMembers.UserId                 = UserInfo.getUserId();
+                        newTeamMembers.OpportunityAccessLevel = 'Read';
+
+                        listNewTeamMembers.add(newTeamMembers);
+                    }
+                }
+            }
+            
+            if (listNewTeamMembers?.size() > 0) {
+                ErrorHandler.handleInsertExceptions(listNewTeamMembers);
+            }
+
+
         }
 
 }

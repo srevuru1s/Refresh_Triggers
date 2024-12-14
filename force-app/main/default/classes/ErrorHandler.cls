@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 11-30-2024
+ * @last modified on  : 12-06-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ErrorHandler {
@@ -32,7 +32,18 @@ public with sharing class ErrorHandler {
 
             exceptionHandler(error);               
         }
-    }    
+    }  
+    
+    public static void handleDeleteExceptions(List<Sobject> listOfRecords) {
+        
+        try {
+            delete as user listOfRecords;
+        }
+        catch(Exception error) {
+
+            exceptionHandler(error);               
+        }
+    }
 
     public static void exceptionHandler(Exception allErrors) {
         //* collect all the list of errors

@@ -1,0 +1,35 @@
+<!--
+  @description       : 
+  @author            : sagar@salesforce.learning
+  @group             : 
+  @last modified on  : 12-11-2024
+  @last modified by  : sagar@salesforce.learning
+-->
+<template>
+    <lightning-card  variant="Narrow"  title="Two Way Binding" icon-name="standard:account">
+        
+        <div class= "slds-var-m-around_medium">
+            <lightning-input type="text" variant="standard" name="data binding" label="My Name" placeholder="type your name here..." onchange={onChangeHandler}></lightning-input>
+            <p class="slds-var-p-horizontal_small">{userName}</p>
+
+            <lightning-button variant="brand" label={getLabel} title="title of the button" onclick={handleClick}></lightning-button> &nbsp;
+            <template lwc:if={showText}>
+                <p class="slds-var-p-horizontal_small">{greeting}</p>
+            </template>
+        </div>
+        
+        <lightning-tabset variant='scoped' active-tab-value='three'>
+            <lightning-tab label='Item One' value='one'>
+                One Content !
+            </lightning-tab>
+            <lightning-tab label='Item Two' value='two'>
+                Two Content !
+            </lightning-tab>
+            <lightning-tab label='Item Three' value='three'>
+                Three Content !
+            </lightning-tab>
+        </lightning-tabset>
+
+    </lightning-card>
+
+</template>

@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-03-2024
+ * @last modified on  : 12-07-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ContactTriggerHelper {
@@ -109,5 +109,27 @@ public with sharing class ContactTriggerHelper {
         }
         
     }
+    //* Sharing the contact record to the public group
+    public static void shareContactToPublicGroup(List<Contact> newContacts, Map<Id,Contact> newMapContact) {
 
+        Id publicGroupId = [SELECT Id FROM GROUP WITH USER_MODE LIMIT 1].Id;
+        List<ContactShare> listContactShareRecords = new List<ContactShare>();
+
+        if (newContacts?.size() >0) {
+            for (Contact contactRecord : newContacts) {
+                
+                ContactShare conShare       = new ContactShare();
+                conShare.ContactId          = contactRecord.Id;
+                conShare.RowCause           = 'Manual';
+                conShare.UserOrGroupId      = publicGroupId;
+                conShare.ContactAccessLevel = 'Read';
+
+                listContactShareRecords.add(conShare);
+            }
+        }
+
+        if (listContactShareRecords?.size() > 0) {
+            ErrorHandler.handleInsertExceptions(listContactShareRecords);
+        }
+    }
 }

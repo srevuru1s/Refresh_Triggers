@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-03-2024
+ * @last modified on  : 12-09-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class OpportunityTriggerHandler {
@@ -22,7 +22,9 @@ public with sharing class OpportunityTriggerHandler {
     
     //!When Opp is closed won, create a Task for the Opp owner 
     public static void handleAfterUpdate(List<Opportunity> newOpportunities, Map<Id,Opportunity> oldMapOpportunities) {
-        
+        //* Method to add team members to opp
+        OpportunityTriggerHelper.addOpportunityTeamMembers(newOpportunities);
+
         List<Task> newTasksForOpportunity = new List<Task>();
 
         if (newOpportunities?.size()>0) {

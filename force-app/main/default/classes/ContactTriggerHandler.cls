@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-03-2024
+ * @last modified on  : 12-07-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ContactTriggerHandler {
@@ -15,6 +15,11 @@ public with sharing class ContactTriggerHandler {
     //* Handle before update
     public static void handleBeforeUpdate(List<Contact> newContacts, Map<Id, Contact> oldMapContact) {
         ContactTriggerHelper.beforeUpdateduplicateContact(newContacts, oldMapContact);
+    }
+
+    //* Handle after insert
+    public static void handleAfterInsert(List<Contact> newContacts, Map<Id,Contact> newMapContact) {
+        ContactTriggerHelper.shareContactToPublicGroup(newContacts, newMapContact);
     }
     
 }
