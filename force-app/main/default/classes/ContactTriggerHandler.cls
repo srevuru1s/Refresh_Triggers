@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-07-2024
+ * @last modified on  : 12-14-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ContactTriggerHandler {
@@ -11,6 +11,8 @@ public with sharing class ContactTriggerHandler {
     public static void handleBeforeInsert(List<Contact> newContacts) {
         ContactTriggerHelper.accountIdIsNotBlank(newContacts);
         ContactTriggerHelper.contactDuplicateCheck(newContacts);
+        ContactTriggerHelper.updateContactBillingAddressFromAccount(newContacts);
+        ContactTriggerHelper.maxContactsAllowed(newContacts);
     }
     //* Handle before update
     public static void handleBeforeUpdate(List<Contact> newContacts, Map<Id, Contact> oldMapContact) {
@@ -22,4 +24,8 @@ public with sharing class ContactTriggerHandler {
         ContactTriggerHelper.shareContactToPublicGroup(newContacts, newMapContact);
     }
     
+    //* Handle after update
+    public static void handleAfterUpdate(Map<Id,Contact> newMapContacts, Map<Id,Contact> oldMapContacts) {
+        ContactTriggerHelper.sendEmailToAccountOwner(newMapContacts, oldMapContacts);
+    }
 }

@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-13-2024
+ * @last modified on  : 12-14-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class TaskTriggerDispatcher {
@@ -14,7 +14,7 @@ public with sharing class TaskTriggerDispatcher {
                 TaskTriggerHandler.handleBeforeInsert(Trigger.new);
             }
             When BEFORE_UPDATE {
-            
+                TaskTriggerHandler.verifyTaskUpdatePermissionOnAccount(Trigger.new, (Map<Id,Task>) Trigger.oldMap);
             }
             When BEFORE_DELETE {
             
