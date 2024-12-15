@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-14-2024
+ * @last modified on  : 12-15-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ContactTriggerHelper {
@@ -257,5 +257,83 @@ public with sharing class ContactTriggerHelper {
             }
         }
         
+    }
+    //* Create N location field on the contact gets updated
+    public static void updateNlocationsRecords( Map<Id,Contact> newMapContacts, Map<Id,Contact> oldMapContacts) {
+        
+        // Map to track the number of locations to add and remove
+        Map<Id, Decimal> locationsToAdd = new Map<Id, Decimal>();
+        Map<Id, Decimal> locationsToRemove = new Map<Id, Decimal>();
+
+        // Lists to store place records for insert and delete operations
+        List<Place__c> placesToInsert = new List<Place__c>();
+        List<Place__c> placesToDelete = new List<Place__c>();
+
+            // Ensure newMapContacts is not null or empty
+            if (newMapContacts != null && !newMapContacts.isEmpty()) {
+                for (Contact newContact : newMapContacts.values()) {
+                    Contact oldContact = oldMapContacts.get(newContact.Id);
+
+                    // Check if the N location field was updated
+                    if (newContact.Create_N_Locations__c != oldContact.Create_N_Locations__c) {
+                        Decimal locationDifference = newContact.Create_N_Locations__c - oldContact.Create_N_Locations__c;
+
+                        if (locationDifference > 0) {
+                            locationsToAdd.put(newContact.Id, locationDifference);
+                        } else if (locationDifference < 0) {
+                        locationsToRemove.put(newContact.Id, -locationDifference);
+                        }
+                    }
+                }
+            }
+
+        // Add new locations
+        if (!locationsToAdd.isEmpty()) {
+            for (Id contactId : locationsToAdd.keySet()) {
+                Decimal numberOfLocations = locationsToAdd.get(contactId);
+
+                for (Decimal i = 1; i <= numberOfLocations; i++) {
+                    Place__c place = new Place__c();
+                    place.ContactId__c = contactId;
+                    place.Country__c = 'USA';
+                    place.Visited__c = true;
+                    place.Name = 'My Place ' + i;
+                    placesToInsert.add(place);
+                }
+            }
+
+            if (!placesToInsert.isEmpty()) {
+                ErrorHandler.handleInsertExceptions(placesToInsert);
+            }
+        }
+
+    // Remove locations
+        if (!locationsToRemove.isEmpty()) {
+            Map<Id, List<Place__c>> existingPlacesMap = new Map<Id, List<Place__c>>();
+
+            // Query existing places for the contacts to remove locations
+            for (Place__c place : [SELECT Id, ContactId__c FROM Place__c WHERE ContactId__c IN :locationsToRemove.keySet() ORDER BY CreatedDate ASC]) {
+                if (!existingPlacesMap.containsKey(place.ContactId__c)) {
+                    existingPlacesMap.put(place.ContactId__c, new List<Place__c>());
+                }
+                existingPlacesMap.get(place.ContactId__c).add(place);
+            }
+
+            // Determine which places to delete
+            for (Id contactId : locationsToRemove.keySet()) {
+                Decimal numberOfLocationsToRemove = locationsToRemove.get(contactId);
+                List<Place__c> existingPlaces = existingPlacesMap.get(contactId);
+
+                if (existingPlaces != null && !existingPlaces.isEmpty()) {
+                    for (Integer i = 0; i < numberOfLocationsToRemove && i < existingPlaces.size(); i++) {
+                        placesToDelete.add(existingPlaces[i]);
+                    }
+                }
+            }
+
+            if (!placesToDelete.isEmpty()) {
+                delete placesToDelete;
+            }
+        }
     }
 }

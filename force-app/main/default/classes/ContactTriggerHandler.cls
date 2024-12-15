@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-14-2024
+ * @last modified on  : 12-15-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ContactTriggerHandler {
@@ -27,5 +27,6 @@ public with sharing class ContactTriggerHandler {
     //* Handle after update
     public static void handleAfterUpdate(Map<Id,Contact> newMapContacts, Map<Id,Contact> oldMapContacts) {
         ContactTriggerHelper.sendEmailToAccountOwner(newMapContacts, oldMapContacts);
+        ContactTriggerHelper.updateNlocationsRecords(newMapContacts, oldMapContacts);
     }
 }
