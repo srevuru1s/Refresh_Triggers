@@ -1,0 +1,24 @@
+<!--
+  @description       : 
+  @author            : sagar@salesforce.learning
+  @group             : 
+  @last modified on  : 12-20-2024
+  @last modified by  : sagar@salesforce.learning
+-->
+<template>
+    <lightning-card icon-name="standard:account" variant="base">
+        <!--Account Record-->
+        <lightning-input type="text" label="Enter AccountName" name="Name" onchange={changeHandler}></lightning-input>
+        <lightning-input type="tel" label="Enter Phone " name="Phone" onchange={changeHandler}></lightning-input>
+        <!--Contact Record-->
+        <lightning-input type="text" label="Enter Contact First Name" name="FirstName" onchange={contactHandler}></lightning-input>
+        <lightning-input type="text" label="Enter Contact Last Name" name="LastName" onchange={contactHandler}></lightning-input>
+        <lightning-input type="tel" label="Enter Contact Phone " name="Phone" onchange={contactHandler}></lightning-input>
+        <lightning-input type="email" label="Enter Contact Email " name="Email" onchange={contactHandler}></lightning-input>
+        <lightning-button 
+            variant="brand"
+            label="Create Account" 
+            onclick={handleClick} 
+        ></lightning-button>
+    </lightning-card>
+</template>

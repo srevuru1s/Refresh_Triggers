@@ -1,8 +1,12 @@
 # Custom Dictionary Words
 Contcats
 datatable
+deactive
 Nlocations
+numberof
+PROFILEID
 retieve
 slds
 Updateduplicate
 updateTriggerAmount
+userdetails

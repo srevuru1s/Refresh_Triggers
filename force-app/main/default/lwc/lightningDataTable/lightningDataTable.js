@@ -26,7 +26,7 @@ export default class LightningDataTable extends LightningElement {
     handleClick() {
 
         this.getAccounts();
-        this.showData = !this.showData;
+        
     }
 
     getAccounts() {
@@ -34,6 +34,7 @@ export default class LightningDataTable extends LightningElement {
             .then((result) => {
                 console.log(`results : ${result}`);
                 this.data = result;
+                this.showData = !this.showData;
             })
             .catch((error) => {
                 console.error(`We got error while calling apex ${error}`);

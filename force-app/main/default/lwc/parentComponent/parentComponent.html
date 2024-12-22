@@ -1,0 +1,28 @@
+<!--
+  @description       : 
+  @author            : sagar@salesforce.learning
+  @group             : 
+  @last modified on  : 12-17-2024
+  @last modified by  : sagar@salesforce.learning
+-->
+<template>
+    <lightning-card  variant="Narrow"  title="Hello" icon-name="standard:account">
+        <lightning-button variant="brand" label="Call Child Method" title="Parent Component" onclick={handleClick}></lightning-button>
+        <!---Adding child component-->
+        <c-arrow-function userdetails = {parentUser} address = {parentAddress}></c-arrow-function>
+        <template lwc:if={arrayRecords}></template>
+        <p>Get Method Details : {arrayRecords.city}</p>
+
+        <lightning-input type="datetime" variant="standard" name="todayDate" label="EnterDate" placeholder="type date here..." onchange={handleDateChange}></lightning-input>
+
+        <div class="myClass" 
+        title="This is a div" 
+        data-id="123" 
+        onclick={handleDivClick} 
+        style="background-color: lightblue;" >
+        
+            <lightning-button variant="brand" label="button1" title="ChildButton1" onclick={handleClickButton1} ></lightning-button>
+            <lightning-button variant="brand" label="button2" title="ChildButton2" onclick={handleClickButton2}></lightning-button>
+        </div>
+    </lightning-card>
+</template>

@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-13-2024
+ * @last modified on  : 12-21-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ContactTriggerDispatcher {
@@ -29,7 +29,7 @@ public with sharing class ContactTriggerDispatcher {
             }
             WHEN AFTER_DELETE {     
                 
-            }
+            }         
             WHEN AFTER_UNDELETE {
                 
             }

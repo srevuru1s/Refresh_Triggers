@@ -24,4 +24,6 @@ export default class TwoWayDataBinding extends LightningElement {
         this.showText = true;
         this.getLabel(true);
     }
+
+
 }

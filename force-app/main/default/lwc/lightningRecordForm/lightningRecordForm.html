@@ -1,0 +1,31 @@
+<!--
+  @description       : 
+  @author            : sagar@salesforce.learning
+  @group             : 
+  @last modified on  : 12-19-2024
+  @last modified by  : sagar@salesforce.learning
+-->
+<template>
+    <lightning-card title="Account Record Form" icon-name="standard:account">
+        <lightning-record-form
+            object-api-name={objectApiName}
+            fields={accountFields}
+            columns={columns}
+            mode="edit"
+            record-id={recordId}
+            onsuccess={successHandler}>
+            
+        </lightning-record-form>
+        <lightning-record-view-form
+                    record-id={recordId}
+                    object-api-name={objectApiName}>
+            <div class="slds-box slds-theme_default">
+                <lightning-output-field field-name="Name"></lightning-output-field>
+                <lightning-output-field field-name="Phone"></lightning-output-field>
+                <lightning-output-field field-name="Email"></lightning-output-field>
+                <lightning-output-field field-name="Industry"></lightning-output-field>
+                <lightning-output-field field-name="Active__c"></lightning-output-field>
+            </div>
+        </lightning-record-view-form>
+    </lightning-card>
+</template>

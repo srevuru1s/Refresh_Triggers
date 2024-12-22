@@ -1,0 +1,34 @@
+<!--
+  @description       : 
+  @author            : sagar@salesforce.learning
+  @group             : 
+  @last modified on  : 12-21-2024
+  @last modified by  : sagar@salesforce.learning
+-->
+<template>
+    <lightning-card icon-name="standard:account" variant="base" title="Insert Account with wire">
+        <lightning-input 
+            type="text"
+            label="Name of the account"
+            name = "aname"
+            onchange={handleChange}
+        ></lightning-input>
+        <lightning-input 
+            type="text"
+            label="Account Industry"
+            name="accIndustry"
+            onchange={handleChange}
+        ></lightning-input>
+        <lightning-input 
+            type="tel"
+            label="Account phone"
+            name="accPhone"
+            onchange={handleChange}
+        ></lightning-input>
+        <lightning-button 
+            variant="brand"
+            label="Insert Account with wire" 
+            onclick={handleClick} 
+        ></lightning-button>
+    </lightning-card>
+</template>

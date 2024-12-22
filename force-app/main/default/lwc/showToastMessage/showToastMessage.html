@@ -1,0 +1,36 @@
+<!--
+  @description       : 
+  @author            : sagar@salesforce.learning
+  @group             : 
+  @last modified on  : 12-18-2024
+  @last modified by  : sagar@salesforce.learning
+-->
+<template>
+
+    <lightning-card  variant="brand"  title="Show Toast Message" icon-name="standard:account">
+        <lightning-button variant="brand" label="Show Toast" title="Toast Message" onclick={showToast}></lightning-button>
+
+        <template for:each={userDetails} for:item="user" for:index="index">
+            <div key={user.firstName}>
+                <p>My first user index {index} firstName : {user.firstName}</p>
+                <p>{user.lastName}</p>
+            </div>
+        </template>
+        
+        <div lwc:if={userDetails}>
+            <p> User details property has the value</p>
+        </div>
+
+        
+        <lightning-input
+        label="Name"
+        type="text"
+        value={name}
+        onchange={handleInputChange}>
+        </lightning-input>
+        <p> Hello this is the input values {name}</p>
+    </lightning-card>
+
+    <lightning-input lwc:ref="nameInput" label="Name" type="text"></lightning-input>
+    <p> From FEF Input : {refValue}</p>
+</template>

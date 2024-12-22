@@ -1,0 +1,20 @@
+<!--
+  @description       : 
+  @author            : sagar@salesforce.learning
+  @group             : 
+  @last modified on  : 12-19-2024
+  @last modified by  : sagar@salesforce.learning
+-->
+<template>
+    <lightning-card  variant="Narrow"  title="From Parent Component" icon-name="standard:account">
+        <!--Embed childe component we need to use ka-baba-case-->
+        <c-communication-child-component user-details = {parentUserDetails}>
+            <p slot="first">  This is a named slot-1 information coming from parent </p>
+            <p slot="second"> This is a named slot-2 information coming from parent </p>
+            <p slot="third">  This is a named slot-3 information coming from parent </p>
+        </c-communication-child-component>
+
+        <lightning-button variant="brand" label="Send User Details to Child" title="parent user button" onclick={handleClick}></lightning-button>
+        <lightning-button variant="brand" label="Call Child Method" title="parent method" onclick={callChildMethod}></lightning-button>
+    </lightning-card>
+</template>

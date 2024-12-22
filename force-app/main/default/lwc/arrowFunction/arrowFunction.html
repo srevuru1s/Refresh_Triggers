@@ -1,0 +1,25 @@
+<!--
+  @description       : 
+  @author            : sagar@salesforce.learning
+  @group             : 
+  @last modified on  : 12-16-2024
+  @last modified by  : sagar@salesforce.learning
+-->
+<template>
+    <lightning-card  variant="Narrow"  title="Hello" icon-name="standard:account">
+        <lightning-button variant="brand" label="Arrow Function" title="Display Function" onclick={handleClick}></lightning-button>
+        <p>{message}</p>
+        <template lwc:if={userdetails}>
+            
+                    {userdetails.name} From {userdetails.number}
+
+        </template>
+        <template lwc:if={address}>
+            <template for:each={address} for:item="place">
+                <div key = {place.city}>
+                    <P> Home Ground {place.city} and State {place.State}</P>
+                </div>
+            </template>
+        </template>
+    </lightning-card>
+</template>

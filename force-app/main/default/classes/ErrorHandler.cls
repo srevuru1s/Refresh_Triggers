@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-06-2024
+ * @last modified on  : 12-21-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ErrorHandler {
@@ -87,4 +87,38 @@ public with sharing class ErrorHandler {
         }
         
     }    
+
+    public static void dataBaseInsert(List<Sobject> listOfRecords) {
+        
+        //* collect all the list of errors
+        List<Error_Logger__c> listErrorRecords = new List<Error_Logger__c>();
+
+        if (listOfRecords?.size() > 0) {
+            
+            List<Database.SaveResult> listRecords = Database.insert(listOfRecords, false);
+            //* loop through the list of records
+            for (Database.SaveResult dataBaseRecord : listRecords) {
+                
+                if (!dataBaseRecord.isSuccess()) {
+                    
+                    List<Database.Error> listErrors = dataBaseRecord.getErrors();
+                    for (Database.Error errorDetails : listErrors) {
+                        
+                        Error_Logger__c errorRecord = new Error_Logger__c();
+
+                        errorRecord.Error_Message__c         = errorDetails.message + dataBaseRecord.id;
+                        errorRecord.Error_Type__c            = String.valueOf(errorDetails.getStatusCode());
+                        errorRecord.Stack_Trace_Message__c   = errorDetails.getMessage() ;
+                        errorRecord.Name                     = String.valueOf(errorDetails.statuscode) + errorDetails.fields;
+
+                        listErrorRecords.add(errorRecord);
+                    }
+                }
+            }
+        }
+        if (listErrorRecords?.size() > 0) {
+            
+            insert as user listErrorRecords;
+        }
+    }
 }

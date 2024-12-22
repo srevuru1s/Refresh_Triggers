@@ -1,0 +1,23 @@
+<!--
+  @description       : 
+  @author            : sagar@salesforce.learning
+  @group             : 
+  @last modified on  : 12-19-2024
+  @last modified by  : sagar@salesforce.learning
+-->
+<template>
+    <lightning-card  variant="Narrow"  title="From Child Component" icon-name="standard:account">
+        <template lwc:if={userDetails}>
+            <template for:each={userDetails} for:item="user">
+                <div key = {user.name}>
+                    <p> From parent = My First Name : {user.firstName} and Last Name : {user.lastName}</p>
+                </div>
+            </template>
+        </template>
+        <div title="Slots">
+            <slot name="first"></slot>
+            <slot name="second"></slot>
+            <slot name="third"></slot>
+        </div>
+    </lightning-card>
+</template>
