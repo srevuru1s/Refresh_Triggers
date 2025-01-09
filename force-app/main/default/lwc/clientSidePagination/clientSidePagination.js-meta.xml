@@ -19,6 +19,5 @@
         <!--<target>lightningCommunity__Default</target>-->
         <!--<target>lightningCommunity__Page_Layout</target>-->
         <!--<target>lightningCommunity__Theme_Layout</target>-->
-        <!-- Configuring the design attributes -->
     </targets>
 </LightningComponentBundle>

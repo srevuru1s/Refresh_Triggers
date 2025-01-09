@@ -1,0 +1,26 @@
+<!--
+  @description       : 
+  @author            : sagar@salesforce.learning
+  @group             : 
+  @last modified on  : 01-06-2025
+  @last modified by  : sagar@salesforce.learning
+-->
+<template>
+    <lightning-card icon-name="standard:account" variant="base" title="Pagination Records">
+        <template lwc:if={data} for:each={data} for:item="record">
+            <!--
+            <lightning-datatable
+                key-field="id"
+                columns={columns}
+                data={data}
+                >
+            </lightning-datatable>
+            -->
+            <div key={record.Id}>{record.Name}</div> 
+
+        </template>
+            
+        <lightning-button variant="brand" label="Next Page" onclick={nextPageHandler}></lightning-button>
+        <lightning-button variant="brand" label="Previous Page" onclick={previousPageHandler} disabled={hidePreviousButton}></lightning-button>
+    </lightning-card>
+</template>

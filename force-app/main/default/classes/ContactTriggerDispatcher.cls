@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-21-2024
+ * @last modified on  : 01-06-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ContactTriggerDispatcher {
@@ -19,7 +19,7 @@ public with sharing class ContactTriggerDispatcher {
                 ContactTriggerHandler.handleBeforeUpdate(Trigger.new, (Map<Id, Contact>)Trigger.oldMap);
             }
             WHEN BEFORE_DELETE {
-                
+                ContactTriggerHandler.handleBeforeDelete(Trigger.old, (Map<Id,Contact>) Trigger.oldMap);
             }
             WHEN AFTER_INSERT {
                 ContactTriggerHandler.handleAfterInsert(Trigger.new, (Map<Id,Contact>)Trigger.newMap);

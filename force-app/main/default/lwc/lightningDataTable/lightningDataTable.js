@@ -20,7 +20,6 @@ export default class LightningDataTable extends LightningElement {
 
     renderedCallback() {
 
-
     }
     
     handleClick() {

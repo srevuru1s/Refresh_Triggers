@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-15-2024
+ * @last modified on  : 01-06-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ContactTriggerHelper {
@@ -333,6 +333,37 @@ public with sharing class ContactTriggerHelper {
 
             if (!placesToDelete.isEmpty()) {
                 delete placesToDelete;
+            }
+        }
+    }
+    //* Stop Deleting the contacts if contact is associated with account
+    public static void validateContactDeletion(Map<Id,Contact> oldMapContacts) {
+
+        //* Collect the map of account Id with contact
+        Map<Id,Contact> accountIdContacts = new Map<Id,Contact>();
+
+        if (oldMapContacts?.size() > 0) {
+            
+            for (Contact conRecord : oldMapContacts.values()) {
+                
+                if (conRecord.AccountId != null) {
+                    
+                    accountIdContacts.put(conRecord.AccountId, conRecord);
+                }
+            }
+        }
+
+        if (accountIdContacts?.size() > 0) {
+            
+            Map<Id,Contact> queryaccIdContacts = new Map<Id,Contact>([SELECT Id, FirstName FROM Contact WHERE AccountId IN: accountIdContacts.keySet() WITH USER_MODE LIMIT 50000]); 
+
+            for (Contact deleteContact : oldMapContacts.values()) {
+                
+                if (queryaccIdContacts.containsKey(deleteContact.Id)) {
+                    
+                    // deleteContact.addError('You can\'t Deleted the contact associated with Account');
+                    deleteContact.AccountId.addError('Account Name should be removed before delete');
+                }
             }
         }
     }

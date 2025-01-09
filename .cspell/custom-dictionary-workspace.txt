@@ -4,6 +4,8 @@ datatable
 deactive
 Nlocations
 numberof
+onloadmore
+onrowaction
 PROFILEID
 retieve
 slds

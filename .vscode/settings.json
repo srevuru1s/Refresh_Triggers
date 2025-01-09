@@ -43,5 +43,12 @@
       "addWords": true,
       "scope": "workspace"
     }
+  },
+  "salesforce.einsteinForDevelopers.enableAutocompletions": false,
+  "salesforce.einsteinForDevelopers.enableAutocompletionsByFileType": {
+    "apex": false,
+    "javascript": true,
+    "css": true,
+    "html": true
   }
 }

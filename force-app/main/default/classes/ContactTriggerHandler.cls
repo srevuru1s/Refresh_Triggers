@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-15-2024
+ * @last modified on  : 01-06-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ContactTriggerHandler {
@@ -28,5 +28,10 @@ public with sharing class ContactTriggerHandler {
     public static void handleAfterUpdate(Map<Id,Contact> newMapContacts, Map<Id,Contact> oldMapContacts) {
         ContactTriggerHelper.sendEmailToAccountOwner(newMapContacts, oldMapContacts);
         ContactTriggerHelper.updateNlocationsRecords(newMapContacts, oldMapContacts);
+    }
+
+    //* Handle Before Delete
+    public static void handleBeforeDelete(List<Contact> oldContacts, Map<Id,Contact> oldMapContacts) {
+        ContactTriggerHelper.validateContactDeletion(oldMapContacts);
     }
 }

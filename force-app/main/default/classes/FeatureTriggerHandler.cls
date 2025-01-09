@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-22-2024
+ * @last modified on  : 12-23-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class FeatureTriggerHandler {
@@ -32,7 +32,7 @@ public with sharing class FeatureTriggerHandler {
         //* Query the number feature records associate with sub
         if (mapSubIdFeature?.size() > 0) {
             
-            List<AggregateResult> aggRecords = [SELECT COUNT(ID) numberOfFeatureRecord, Subscription__c subscriptionId FROM Feature__c WHERE Subscription__c IN: mapSubIdFeature.keySet() 
+            List<AggregateResult> aggRecords = [SELECT COUNT(ID) numberOfFeatureRecord, Subscription__c subscriptionId FROM Feature__c WHERE Subscription__c IN: mapSubIdFeature.keySet() AND Is_Active__c = true
                                                 WITH USER_MODE GROUP BY Subscription__c LIMIT 50000];
             for (AggregateResult aggRec : aggRecords) {
                 

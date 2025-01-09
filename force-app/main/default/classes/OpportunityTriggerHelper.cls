@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-09-2024
+ * @last modified on  : 01-04-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class OpportunityTriggerHelper {
@@ -110,8 +110,6 @@ public with sharing class OpportunityTriggerHelper {
             if (listNewTeamMembers?.size() > 0) {
                 ErrorHandler.handleInsertExceptions(listNewTeamMembers);
             }
-
-
         }
 
 }

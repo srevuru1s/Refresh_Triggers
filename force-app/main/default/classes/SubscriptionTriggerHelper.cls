@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-22-2024
+ * @last modified on  : 12-23-2024
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class SubscriptionTriggerHelper {
@@ -85,8 +85,8 @@ public with sharing class SubscriptionTriggerHelper {
                         Integer featureRecordsToCreate = newPlan - oldPlan;
                         subIdNewFeatureRecordsToCreate.put(newSubRecord.Id, featureRecordsToCreate);
                     } else {
-                        
-                        Integer featureRecordsToDeactivate = oldPlan - newPlan;
+                        //* we have one 1 record in plan difference for basic is handled 
+                        Integer featureRecordsToDeactivate = oldPlan - newPlan ;
                         subIdOldFeatureRecordsDeactivate.put(newSubRecord.Id, featureRecordsToDeactivate);
                     }
                 }
@@ -99,7 +99,7 @@ public with sharing class SubscriptionTriggerHelper {
 
         //* Query the records to create
         if (subIdNewFeatureRecordsToCreate?.size() > 0) {
-            List<Feature__c> allFeatureRecords =  queryFeatureRecords(subIdNewFeatureRecordsToCreate);
+            List<Feature__c> allFeatureRecords =  queryFeatureRecords(subIdNewFeatureRecordsToCreate, true);
             
             if (allFeatureRecords?.size() > 0) {
                 
@@ -148,14 +148,15 @@ public with sharing class SubscriptionTriggerHelper {
 
         //* Query the records to be deactivated 
         if (subIdOldFeatureRecordsDeactivate?.size() > 0) {
-            List<Feature__c> allFeatureRecords =  queryFeatureRecords(subIdOldFeatureRecordsDeactivate);
+            List<Feature__c> allFeatureRecords =  queryFeatureRecords(subIdOldFeatureRecordsDeactivate, true);
 
             if (allFeatureRecords?.size() > 0) {
                 
                 for (Feature__c  featureRecord : allFeatureRecords) {
                     
-                        for (Integer i=0; i < subIdOldFeatureRecordsDeactivate.get(featureRecord.Subscription__c); i++) {
+                        for (Integer i=0; i <= subIdOldFeatureRecordsDeactivate.get(featureRecord.Subscription__c); i++) {
                             
+                            System.debug('Key :' + subIdOldFeatureRecordsDeactivate.get(featureRecord.Subscription__c));
                             //* check the feature record isActive or not
                             if (featureRecord.Is_Active__c != false) {
                                 
@@ -164,16 +165,19 @@ public with sharing class SubscriptionTriggerHelper {
                                 updateFeatureRecord.Is_Active__c              = false;
     
                                 //* decreasing the map of deactivation records by 1 every time loop runs
+                                    
                                 subIdOldFeatureRecordsDeactivate.put(featureRecord.Subscription__c, subIdOldFeatureRecordsDeactivate.get(featureRecord.Subscription__c) - 1);
-    
+                                
                                 if (!mapDeactivateFeatureRecords.containsKey(featureRecord.Id)) {
                                     
                                     mapDeactivateFeatureRecords.put( featureRecord.Id, updateFeatureRecord);
+                                    System.debug('The size of the list :' + mapDeactivateFeatureRecords.size());
                                 }
                             }
 
                         }
                         deactiveFeatureRecordsMap.put(featureRecord.Subscription__c, mapDeactivateFeatureRecords.values());
+                        System.debug('Count of the map records: ' + deactiveFeatureRecordsMap.size());
                     
                 }
             }
@@ -199,12 +203,12 @@ public with sharing class SubscriptionTriggerHelper {
         }
     }
 
-    public static List<Feature__c> queryFeatureRecords(Map<Id,Integer> mapOfSubIdToFeatureRecords) {
+    public static List<Feature__c> queryFeatureRecords(Map<Id,Integer> mapOfSubIdToFeatureRecords, Boolean isActive) {
 
         if (mapOfSubIdToFeatureRecords?.size() > 0) {
             
             //* Query the records
-            List<Feature__c> featureRecordList = [SELECT Id, Is_Active__c, Subscription__c, Number_Devices_Support__c, Quality__c FROM Feature__c WHERE Subscription__c IN : mapOfSubIdToFeatureRecords.keySet()
+            List<Feature__c> featureRecordList = [SELECT Id, Is_Active__c, Subscription__c, Number_Devices_Support__c, Quality__c FROM Feature__c WHERE Subscription__c IN : mapOfSubIdToFeatureRecords.keySet() AND Is_Active__c =: isActive
                                                     WITH USER_MODE ORDER BY CreatedDate ASC LIMIT 50000];
 
             return featureRecordList;
@@ -212,5 +216,5 @@ public with sharing class SubscriptionTriggerHelper {
             return new List<Feature__c>();
         }
     }
- 
+    
 }
