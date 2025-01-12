@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 01-10-2025
+ * @last modified on  : 01-11-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ContactTriggerHelper {
@@ -431,4 +431,24 @@ public with sharing class ContactTriggerHelper {
             ErrorHandler.handleUpdateExceptions(listAccountToUpdate);
         }
     }    
+
+    //* Check the number of times contcat email got updated
+    public static void limitContactEmailUpdate(List<Contact> newContacts, Map<Id,Contact> oldMapContact) {
+
+        if (newContacts?.size() > 0) {
+            
+            for (Contact contactRecord : newContacts) {
+                
+                if (contactRecord.Email != oldMapContact.get(contactRecord.Id).Email) {
+                    
+                    contactRecord.Email_Update_Count__c = (contactRecord.Email_Update_Count__c == null) ? 0 : (contactRecord.Email_Update_Count__c <= 3) ? contactRecord.Email_Update_Count__c += 1 : 4;
+                    
+                    if (contactRecord.Email_Update_Count__c >  3) {
+                        contactRecord.Email_Update_Count__c.addError('Email Updated Max times');
+                    }
+                }
+            }
+        }
+    } 
+
 }

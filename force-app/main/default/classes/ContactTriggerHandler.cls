@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 01-10-2025
+ * @last modified on  : 01-11-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ContactTriggerHandler {
@@ -17,6 +17,7 @@ public with sharing class ContactTriggerHandler {
     //* Handle before update
     public static void handleBeforeUpdate(List<Contact> newContacts, Map<Id, Contact> oldMapContact) {
         ContactTriggerHelper.beforeUpdateduplicateContact(newContacts, oldMapContact);
+        ContactTriggerHelper.limitContactEmailUpdate(newContacts, oldMapContact);
     }
 
     //* Handle after insert
