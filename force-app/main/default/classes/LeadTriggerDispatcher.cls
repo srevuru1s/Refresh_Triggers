@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 11-29-2024
+ * @last modified on  : 01-11-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class LeadTriggerDispatcher {
@@ -12,7 +12,7 @@ public with sharing class LeadTriggerDispatcher {
         switch on operationType {
             
             WHEN BEFORE_INSERT {
-                
+                LeadTriggerHandler.assignLeadQueue(Trigger.new);
             }
             When BEFORE_UPDATE {
                 LeadTriggerHandler.handleBeforeUpdate(Trigger.new, (Map<Id, Lead>) Trigger.oldMap);

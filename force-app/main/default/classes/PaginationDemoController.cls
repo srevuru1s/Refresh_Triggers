@@ -29,4 +29,5 @@ public with sharing class PaginationDemoController {
     public static List<AggregateResult> getTotalAccountsCount(){
         return [SELECT COUNT(ID) FROM Account WITH USER_MODE];
     }
+    
 }

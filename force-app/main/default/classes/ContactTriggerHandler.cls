@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 01-06-2025
+ * @last modified on  : 01-10-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ContactTriggerHandler {
@@ -22,6 +22,8 @@ public with sharing class ContactTriggerHandler {
     //* Handle after insert
     public static void handleAfterInsert(List<Contact> newContacts, Map<Id,Contact> newMapContact) {
         ContactTriggerHelper.shareContactToPublicGroup(newContacts, newMapContact);
+        ContactTriggerHelper.sendWelcomeEmail(newMapContact);
+        ContactTriggerHelper.updateAccountIndustry(newMapContact);
     }
     
     //* Handle after update

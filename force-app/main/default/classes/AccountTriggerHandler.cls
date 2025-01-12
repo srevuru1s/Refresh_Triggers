@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 11-27-2024
+ * @last modified on  : 01-09-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class AccountTriggerHandler {
@@ -23,5 +23,10 @@ public with sharing class AccountTriggerHandler {
         public static void handleAfterUpdate(List<Account> newAccounts, Map<Id, Account> newMapAccounts, Map<Id, Account> oldMapAccounts) {
             AccountTriggerHelper.updateContactWebsiteField(newAccounts, newMapAccounts, oldMapAccounts);
             AccountTriggerHelper.updatedContactNumber(newAccounts, oldMapAccounts);
+            AccountTriggerHelper.updateOpportunitySatgeName(newMapAccounts, oldMapAccounts);
         }
+    //* Handle Before Delete
+        public static void handleBeforeDelete(List<Account> oldAccounts, Map<Id,Account> oldMapAccounts) {
+            AccountTriggerHelper.stopDeletingAccountWithContact(oldAccounts, oldMapAccounts);
+        }    
 }

@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 11-29-2024
+ * @last modified on  : 01-10-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class AccountTriggerHelper {
@@ -164,5 +164,77 @@ public with sharing class AccountTriggerHelper {
                 }
             }
 
+        }
+    //* Method to update Opportunity StageName = Prospecting when Account Industry = 'Technology'
+        public static void updateOpportunitySatgeName(Map<Id,Account> newMapAccounts, Map<Id,Account> oldMapAccounts) {
+
+            //* Map accountId records to update
+            Map<Id,Account> accountToMap = new Map<Id,Account>();
+
+            if (newMapAccounts?.size() > 0)  {
+                
+                for (Account accountRecord : newMapAccounts.values()) {
+                    
+                    //* condition to be checked
+                    if (accountRecord.Industry != oldMapAccounts.get(accountRecord.Id).Industry && accountRecord.Industry == 'Technology') {
+                        
+                        accountToMap.put(accountRecord.Id, accountRecord);
+                    }
+                }
+            }
+            //* Collect the list of Opportunities that need to be updated 
+            List<Opportunity> opportunitiesToUpdate = new List<Opportunity>();
+
+            //* Query all the opportunities associated with the account
+            if (accountToMap?.size() > 0) {
+                
+                Map<Id,Opportunity> mapOpportunities = new Map<Id,Opportunity>([SELECT Id, StageName FROM Opportunity 
+                                                                                WHERE AccountId IN : accountToMap.keySet() WITH USER_MODE LIMIT 50000]);
+                if (mapOpportunities?.size()> 0) {
+                    
+                    for (Opportunity opportunityRecord : mapOpportunities.values()) {
+                        
+                        opportunityRecord.StageName          = 'Prospecting';
+
+                        opportunitiesToUpdate.add(opportunityRecord);
+                    }
+                }
+            }
+            //* Update the opportuities 
+            if (opportunitiesToUpdate?.size() > 0) {
+                
+                ErrorHandler.handleUpdateExceptions(opportunitiesToUpdate);
+            }
+        }
+
+    //* Method to stop deleting the Accounts if it has Contact record
+        public static void stopDeletingAccountWithContact(List<Account> oldAccounts, Map<Id,Account> oldMapAccounts) {
+            //* Set of Account Id's with contact records
+            Set<Id> accId = new Set<Id>();
+
+            if (oldMapAccounts.keySet()?.size() > 0) {
+                
+                //* Query if an account has contact or not
+                List<AggregateResult> aggResults = [SELECT AccountId accId FROM Contact 
+                                                    WHERE AccountId IN : oldMapAccounts.keySet() WITH USER_MODE GROUP BY AccountId HAVING COUNT(ID) >= 1];
+                if (aggResults?.size() > 0) {
+                    
+                    for (AggregateResult aggRecord : aggResults) {
+                        
+                        Id accountRecordId = (Id) aggRecord.get('accId');
+                        accId.add(accountRecordId);
+                    }
+                }
+            }
+            if (accId?.size() > 0) {
+                
+                for (Account accountRecord : oldMapAccounts.values()) {
+                    
+                    if (accId.contains(accountRecord.Id)) {
+                        
+                        accountRecord.addError('You can\'t delete account');
+                    }
+                }
+            }
         }
 }

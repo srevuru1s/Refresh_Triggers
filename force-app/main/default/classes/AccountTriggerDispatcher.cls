@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 11-27-2024
+ * @last modified on  : 01-10-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class AccountTriggerDispatcher {
@@ -17,7 +17,7 @@ public with sharing class AccountTriggerDispatcher {
                 AccountTriggerHandler.handleBeforeUpdate(Trigger.new, (Map<Id, Account>) Trigger.oldMap);
             }
             When BEFORE_DELETE {
-            
+                AccountTriggerHandler.handleBeforeDelete(Trigger.old, (Map<Id,Account>) Trigger.oldMap);
             }
             When AFTER_INSERT {
                 AccountTriggerHandler.handleAfterInsert(Trigger.new, (Map<Id, Account>)Trigger.newMap);
@@ -26,7 +26,7 @@ public with sharing class AccountTriggerDispatcher {
                 AccountTriggerHandler.handleAfterUpdate(Trigger.new, (Map<Id, Account>) Trigger.newMap, (Map<Id, Account>) Trigger.oldMap);
             }
             When AFTER_DELETE {
-    
+                
             }
             When AFTER_UNDELETE {
     

@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 01-06-2025
+ * @last modified on  : 01-10-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ContactTriggerHelper {
@@ -248,7 +248,7 @@ public with sharing class ContactTriggerHelper {
                     
                 if (newContactRecord.AccountId != null && String.isNotBlank(newContactRecord.AccountId)) {
                         
-                    if (accountIdTotalContacts.get(newContactRecord.AccountId) ==  mapAccount.get(newContactRecord.AccountId).Maximum_Contacts__c) {
+                    if (accountIdTotalContacts.get(newContactRecord.AccountId) ==  mapAccount.get(newContactRecord.AccountId).Maximum_Contacts__c && mapAccount.get(newContactRecord.AccountId).Maximum_Contacts__c != null) {
                 
                         newContactRecord.addError('The max number of contacts reached for this account');
                     }
@@ -367,4 +367,68 @@ public with sharing class ContactTriggerHelper {
             }
         }
     }
+    //* Send welcome email to the contacts
+    public static void sendWelcomeEmail(Map<Id,Contact> newMapContacts) {
+        //Collect the list of email to addresses
+        List<String> contactEmailAddress = new List<String>();
+
+        if (newMapContacts?.size() > 0) {
+            
+            for (Contact newConRecord : newMapContacts.values()) {
+                
+                if (!String.isEmpty(newConRecord.Email)) {
+                    contactEmailAddress.add(newConRecord.Email);
+                }
+            }
+        }
+        List<Messaging.SingleEmailMessage> listOfEmails = new List<Messaging.SingleEmailMessage>();
+
+        if (contactEmailAddress?.size()> 0) {
+            
+            Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
+            email.setToAddresses(contactEmailAddress);
+            email.setSubject('Welcome to World of Salesforce');
+            email.setPlainTextBody('Thanks for knowing email class');
+            
+            Messaging.sendEmail(new List<Messaging.SingleEmailMessage> {email});
+        }
+    }
+    
+    //* Update the Account Industry based on the contact Title
+    public static void updateAccountIndustry(Map<Id,Contact> newMapContacts) {
+        Map<Id,Contact> accIdToContact = new Map<Id,Contact>();
+
+        if (newMapContacts?.size() > 0) {
+            
+            for (Contact newContactRecord : newMapContacts.values()) {
+                
+                String accId = newContactRecord.AccountId;
+                if (String.isNotBlank(newContactRecord.Title) & accId.contains('001')) {
+                    
+                    //* Collect the account id's to update the industries
+                    accIdToContact.put(newContactRecord.AccountId, newContactRecord);
+                }
+            }
+        }
+        //* Collect account records that needs to be updated
+        List<Account> listAccountToUpdate = new List<Account>();
+
+        if (accIdToContact?.size() > 0) {
+            
+            for (Id accId : accIdToContact.keySet()) {
+                
+                Account updateAccount   = new Account();
+                updateAccount.Id        = accId;
+                updateAccount.Industry  = accIdToContact.get(accId).Title.contains('Manager') ? 'Management' :  accIdToContact.get(accId).Title.contains('Engineer') ? 'Engineering' : 'Education';
+
+                listAccountToUpdate.add(updateAccount);
+            }
+        }
+
+        //*Update accounts
+        if (listAccountToUpdate?.size() > 0) {
+        
+            ErrorHandler.handleUpdateExceptions(listAccountToUpdate);
+        }
+    }    
 }

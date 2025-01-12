@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 01-04-2025
+ * @last modified on  : 01-09-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class OpportunityTriggerHelper {
@@ -15,9 +15,8 @@ public with sharing class OpportunityTriggerHelper {
                 for (Opportunity opportunityRecord : newOpportunities) {
                         //* condition to check the opp stage is Modified
                         if (opportunityRecord.StageName != oldMapOpportunities.get(opportunityRecord.Id).StageName) {
-                            opportunityRecord.Amount  = (opportunityRecord.Probability * opportunityRecord.ExpectedRevenue);
+                            opportunityRecord.Amount  = (opportunityRecord.Probability * opportunityRecord?.ExpectedRevenue);
                             opportunityRecord.Description = 'Updated From Trigger';
-                            
                         }
                 }
             }
