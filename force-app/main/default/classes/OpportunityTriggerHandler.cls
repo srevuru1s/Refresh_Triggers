@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-09-2024
+ * @last modified on  : 01-14-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class OpportunityTriggerHandler {
@@ -17,11 +17,15 @@ public with sharing class OpportunityTriggerHandler {
 
     public static void handleAfterDelete(List<Opportunity> oldOpportunities, Map<Id, Opportunity> oldMapOpportunities) {
         OpportunityTriggerHelper.createTaskToOpportunityOwner(oldOpportunities, oldMapOpportunities);
+        OpportunityTriggerHelper.updateAccountWithHighestOpportunity(oldOpportunities, oldMapOpportunities);
     }
     //* Handle After Update
     
     //!When Opp is closed won, create a Task for the Opp owner 
-    public static void handleAfterUpdate(List<Opportunity> newOpportunities, Map<Id,Opportunity> oldMapOpportunities) {
+    public static void handleAfterUpdate(List<Opportunity> newOpportunities, Map<Id,Opportunity> newMapOpportunities, Map<Id,Opportunity> oldMapOpportunities) {
+        //* Update account field with highest opp name
+        OpportunityTriggerHelper.updateAccountWithHighestOpportunity(newOpportunities, newMapOpportunities);
+        
         //* Method to add team members to opp
         OpportunityTriggerHelper.addOpportunityTeamMembers(newOpportunities);
 
@@ -78,4 +82,8 @@ public with sharing class OpportunityTriggerHandler {
         }
     }
 
+    //* Handle After Insert
+    public static void handleAfterInsert(List<Opportunity> newOpportunities, Map<Id,Opportunity> newMapOpportunities) {
+        OpportunityTriggerHelper.updateAccountWithHighestOpportunity(newOpportunities, newMapOpportunities);
+    }
 }

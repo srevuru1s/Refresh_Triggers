@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 01-09-2025
+ * @last modified on  : 01-14-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class OpportunityTriggerHelper {
@@ -110,5 +110,46 @@ public with sharing class OpportunityTriggerHelper {
                 ErrorHandler.handleInsertExceptions(listNewTeamMembers);
             }
         }
+        //* Update account with Highest Opportunity Name
+        public static void updateAccountWithHighestOpportunity(List<Opportunity> newOpportunities, Map<Id,Opportunity> newMapOpportunities) {
+            //* Collect the accountid of opportunity
+            Map<Id,Opportunity> accountIdToOpportunity = new Map<Id,Opportunity>();
+            //* List of account records that need to be updated
+            List<Account> accountListToUpdate = new List<Account>();
+            
+            if (newOpportunities?.size() > 0) {
+                
+                for (Opportunity oppRecord : newOpportunities) {
+                    
+                    if (oppRecord.AccountId != null) {
+                        accountIdToOpportunity.put(oppRecord.AccountId, oppRecord);
+                    }
+                }
+            }
+            if (accountIdToOpportunity?.size() > 0) {
+                
+                List<Account> accountOpportunityRecords = [SELECT Id, Name, (SELECT Id, Name FROM Opportunities ORDER BY Amount DESC LIMIT 1) FROM Account WHERE Id IN : accountIdToOpportunity.keySet() WITH USER_MODE LIMIT 5000]; 
 
+                if (accountOpportunityRecords?.size() > 0) {
+                    
+                    for (Account accountRecord : accountOpportunityRecords) {
+                        
+                        for (Opportunity oppRecords : accountRecord.Opportunities) {
+                            
+                            Account accToUpdate                      = new Account();
+                            accToUpdate.Highest_Value_Opportunity__c = oppRecords.Name;
+                            accToUpdate.Id                           = accountRecord.Id;
+
+                            accountListToUpdate.add(accToUpdate);
+                        }
+                        
+                    }
+                }
+            }
+
+            if (accountListToUpdate?.size() > 0) {
+                
+                ErrorHandler.handleUpdateExceptions(accountListToUpdate);
+            }
+        }
 }

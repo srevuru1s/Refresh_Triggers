@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 01-10-2025
+ * @last modified on  : 01-15-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class AccountTriggerHelper {
@@ -68,13 +68,14 @@ public with sharing class AccountTriggerHelper {
     //* Method to create N contacts for each account AFTER UPDATE
         public static void updatedContactNumber (List<Account> newAccounts, Map<Id, Account> oldAccounts) {
             //* Updated new map of contacts
+            //* Updated new map of contacts
             Map<Id,Account> newUpdatedContacts = new Map<Id,Account>();
-            Map<Id, Account> deleteNContact = new Map<Id, Account>();
+            Map<Id, Integer> deleteNContact = new Map<Id, Integer>();
 
             if (newAccounts?.size() > 0) {
                 for (Account accountRecord : newAccounts) {
 
-                    if (accountRecord.Create_N_Contacts__c != null && accountRecord.Create_N_Contacts__c != oldAccounts.get(accountRecord.id).Create_N_Contacts__c) {
+                    if (accountRecord.Create_N_Contacts__c != null && accountRecord.Create_N_Contacts__c != oldAccounts.get(accountRecord.id)?.Create_N_Contacts__c) {
 
                         //* check the new value is greater than the old one
                         if (accountRecord.Create_N_Contacts__c > oldAccounts.get(accountRecord.Id).Create_N_Contacts__c) {
@@ -88,19 +89,30 @@ public with sharing class AccountTriggerHelper {
                             
                             newUpdatedContacts.put(newAccount.Id, newAccount);
                             
-                        } else {
-                            
-                            //* delete N contacts
+                        } else if ( oldAccounts.get(accountRecord.id).Create_N_Contacts__c == null && accountRecord.Create_N_Contacts__c != null) {
+                            //* Create N contacts
                             Account newAccount  = new Account();
                             newAccount.Id       = accountRecord.Id;
-                            newAccount.Create_N_Contacts__c = oldAccounts.get(accountRecord.Id).Create_N_Contacts__c - accountRecord.Create_N_Contacts__c;
+                            newAccount.Industry = accountRecord.Industry;
+                            newAccount.Name     = accountRecord.Name;
+                            newAccount.Create_N_Contacts__c = accountRecord.Create_N_Contacts__c;
                             
-                            deleteNContact.put(newAccount.Id, newAccount);
+                            newUpdatedContacts.put(newAccount.Id, newAccount);
+                        }
+                        else {
+                            
+                            Decimal numberOfRecordsToDelete = (oldAccounts.get(accountRecord.Id)?.Create_N_Contacts__c - accountRecord.Create_N_Contacts__c);
+                            Integer contactRecordToDelete = Integer.valueOf(numberOfRecordsToDelete);
+                            deleteNContact.put(accountRecord.Id, contactRecordToDelete);
                         }
                     }
                 }
             }
 
+            //* Delete the number of Records
+                if (deleteNContact?.size() > 0) {
+                    deleteNContactsFromAccount(deleteNContact);
+                }
             //* for creating new contacts 
                 if (newUpdatedContacts?.size() > 0) {
                     createNContacts(newUpdatedContacts.values());
@@ -147,22 +159,47 @@ public with sharing class AccountTriggerHelper {
                 }
         }    
     //! Method to delete contacts from account
-        public static void deleteNContactsFromAccount(Map<Id,Account> mapAccounts) {
-            Map<Id, List<Contact>> mapOfContactsList = new Map<Id, List<Contact>>();
+        public static void deleteNContactsFromAccount(Map<Id,Integer> accIdMapNumberContactDelete) {
+            
+            //* Map AccountId and its contacts 
+            Map<Id,List<Contact>> mapAccountIdToContacts = new Map<Id,List<Contact>>();
+            //* Collect the list of contacts to delete
+            List<Contact> listContacToDelete = new List<Contact>();
 
-            if (mapAccounts?.size() > 0) {
-
-                List<Contact> listOfContactsToDelete = [SELECT Id FROM Contact WHERE AccountId IN: mapAccounts.keySet() WITH USER_MODE];
-
-                for (Contact contactRecord : listOfContactsToDelete) {
+            if (accIdMapNumberContactDelete?.size() > 0) {
+                //*Query the Contact Records 
+                Map<Id,Contact> mapContacts = new Map<Id,Contact> ([SELECT Id, AccountId FROM Contact WHERE AccountId IN: accIdMapNumberContactDelete.keySet() WITH USER_MODE LIMIT 50000]);
+                //*Loop through the contacts to map account Id to List of contacts
+                for (Contact  contactRecord : mapContacts.values()) {
                     
-                    if (!mapOfContactsList.containsKey(contactRecord.AccountId)) {
-                        mapOfContactsList.put(contactRecord.AccountId, new List<Contact>());
+                    if (!mapAccountIdToContacts.containsKey(contactRecord.AccountId)) {
+                        
+                        mapAccountIdToContacts.put(contactRecord.AccountId, new List<Contact>{contactRecord});   
+                    } else {
+                        //* add the contact to the Map
+                        mapAccountIdToContacts.get(contactRecord.AccountId).add(contactRecord);
                     }
-
-                    mapOfContactsList.get(contactRecord.AccountId).add(contactRecord);
                 }
             }
+            
+            //* Loop the AccountId 
+            if (mapAccountIdToContacts?.size() > 0) {
+                
+                for (Id accId : accIdMapNumberContactDelete.keySet()) {
+                    
+                    for (Integer i = 0;  i < AccIdMapNumberContactDelete.get(accId); i++) {
+                        
+                        listContacToDelete.add(mapAccountIdToContacts.get(accId).get(i));
+                    }
+                }
+            }
+            
+            //* Delete the contacts
+            if (listContacToDelete?.size() > 0) {
+                ErrorHandler.handleDeleteExceptions(listContacToDelete);
+            }
+            
+            
 
         }
     //* Method to update Opportunity StageName = Prospecting when Account Industry = 'Technology'
