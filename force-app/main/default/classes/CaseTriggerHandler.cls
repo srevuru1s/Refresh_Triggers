@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-06-2024
+ * @last modified on  : 01-15-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class CaseTriggerHandler {
@@ -20,6 +20,42 @@ public with sharing class CaseTriggerHandler {
                 }
             }
         } 
+        //* Search for the contact to update the contact Name 
+        //* Collect the email from the cases
+        Set<String> webEmails = new Set<String>();
+        //* Map of contact with email as key
+        Map<String,Contact> emailMapKeyContact = new Map<String,Contact>();
+
+        if (newCases?.size() > 0) {
+
+            for (case caseRecord : newCases) {
+                //* Check for the Web Email field
+                if (caseRecord.SuppliedEmail != null && String.isNotBlank(caseRecord.SuppliedEmail)) {
+                    webEmails.add(caseRecord.SuppliedEmail);
+                }
+            }
+        }
+        if (webEmails?.size() > 0) {
+            //* Query the contact records with the emails
+            List<Contact> contactWithMatchingEmail = [SELECT Id, Email FROM Contact WHERE Email IN : webEmails WITH USER_MODE LIMIT 50000];
+
+            if (contactWithMatchingEmail?.size() > 0) {
+                //* Loop through the list to create a map
+                for (Contact conRecord : contactWithMatchingEmail) {
+                    
+                    emailMapKeyContact.put(conRecord.Email, conRecord);
+                }
+                //* Loop through the case records
+                for (Case caseRecord : newCases) {
+                    
+                    if (caseRecord.SuppliedEmail != null && String.isNotBlank(caseRecord.SuppliedEmail)) {
+                        
+                        caseRecord.ContactId = emailMapKeyContact.get(caseRecord.SuppliedEmail).Id;
+                    }
+                }
+            }
+
+        }
     }   
     //* Handle Before Delete
     public static void handleBeforeDelete(List<Case> oldCases) {
