@@ -34,4 +34,6 @@ Perform Salesforce platform configurations, customizations, declarative developm
 Perform Deployments using Continuous Integration/ Deployment (CI/CD) tools – Jenkins, Copado and Salesforce DX.												
 Craft Lightning Apps combining Lightning Design System, Lightning App Builder and Lightning Web Component features.												
 Perform API Integration between Salesforce, Braze and other third-party systems using REST/SOAP APIs (XML, JSON).												
-"Develop custom reusable Lightning components using  Aura, LWC  framework and develop backend logic using Apex (classes/controllers/triggers), SOQL, platform apps, custom apps, design app data models, interfaces, and security.	"
+"Develop custom reusable Lightning components using  Aura, LWC  framework and develop backend logic using Apex (classes/controllers/triggers), SOQL, platform apps, custom apps, design app data models, interfaces, and security.
+
+1. Updated from the local to git 
