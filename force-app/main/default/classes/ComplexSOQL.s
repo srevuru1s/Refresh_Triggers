@@ -38,3 +38,4 @@ Perform API Integration between Salesforce, Braze and other third-party systems 
 
 1. Updated from the local to git 
 2. These updates are only in my Local.
+3. After the user has been updated with credentials.
