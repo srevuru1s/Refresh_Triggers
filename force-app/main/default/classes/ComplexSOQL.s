@@ -37,3 +37,4 @@ Perform API Integration between Salesforce, Braze and other third-party systems 
 "Develop custom reusable Lightning components using  Aura, LWC  framework and develop backend logic using Apex (classes/controllers/triggers), SOQL, platform apps, custom apps, design app data models, interfaces, and security.
 
 1. Updated from the local to git 
+2. These updates are only in my Local.
