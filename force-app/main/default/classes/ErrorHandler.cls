@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 01-09-2025
+ * @last modified on  : 02-08-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ErrorHandler {
@@ -60,7 +60,7 @@ public with sharing class ErrorHandler {
                     errorRecord.Error_Message__c         = dmlErrors.getMessage();
                     Exception causeOfException           = dmlErrors.getCause();
                     errorRecord.Error_Type__c            = dmlErrors.getTypeName();
-                    errorRecord.Stack_Trace_Message__c   = dmlErrors.getStackTraceString().substring(0, 200);
+                    errorRecord.Stack_Trace_Message__c   = dmlErrors.getStackTraceString().substring(0, Math.min(200, dmlErrors.getStackTraceString().length()));
                     errorRecord.Name                     = 'Error Record' + String.valueOf(i); 
 
                     listErrorRecords.add(errorRecord);
