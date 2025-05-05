@@ -1,6 +1,1 @@
-// Use .soql files to store SOQL queries.
-// You can execute queries in VS Code by selecting the
-//     query text and running the command:
-//     SFDX: Execute SOQL Query with Currently Selected Text
-
-SELECT Id, Name FROM Account WHERE IsDeleted = TRUE ** ALL ROWS **
+SELECT Id, Secondary_Owner__c,  Secondary_Owner__r.Name, Secondary_Owner__r.Email, Secondary_Owner__r.Id FROM Account WHERE Id = '001aj000010ipuMAAQ'

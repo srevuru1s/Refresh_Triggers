@@ -1,1 +1,2 @@
-Id BatchJobId = Database.executeBatch(new BatchApex('Batch Apex'), 10);
+BatchApex callBatch = new BatchApex('Batch Apex');
+Id JobId = Database.executeBatch(callBatch);

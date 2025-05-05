@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 11-25-2024
+ * @last modified on  : 02-28-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class CaseTriggerDispatcher {
@@ -19,7 +19,7 @@ public with sharing class CaseTriggerDispatcher {
 
             }
             WHEN BEFORE_DELETE {
-
+                CaseTriggerHandler.handleBeforeDelete(Trigger.old);
             }
             WHEN AFTER_INSERT {
                 

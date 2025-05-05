@@ -2,11 +2,14 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 01-14-2025
+ * @last modified on  : 03-01-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class OpportunityTriggerHandler {
-    
+    //* Handle Before Insert
+    public static void handleBeforeInsert(List<Opportunity> newOpportunities) {
+        OpportunityTriggerHelper.updateHighestAmount(newOpportunities);
+    }
     //* Handle Before Update
 
     public static void handleBeforeUpdate(List<Opportunity> newOpportunities, Map<Id, Opportunity> oldMapOpportunities) {

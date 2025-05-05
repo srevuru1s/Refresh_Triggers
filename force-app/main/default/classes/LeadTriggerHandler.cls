@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 01-11-2025
+ * @last modified on  : 03-06-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class LeadTriggerHandler {
@@ -47,6 +47,43 @@ public with sharing class LeadTriggerHandler {
                     newLeadRecord.OwnerId = queueId;
                 }
             }
+        }
+    }
+    //* Handle After Update
+    //! Create an opportunity record if the Account Industry is Education
+    public static void updateOpportunityStageNameConvertedLead(Map<Id,Lead> newMapLead, Map<Id,Lead> oldMapLead) {
+
+        Set<Id> setAccId = new Set<Id>();
+        
+        if(newMapLead?.size() > 0) {
+            
+            for(Lead leadRecord : newMapLead.values()) {
+                //* check the condition for lead is converted or not
+                if(leadRecord.IsConverted && oldMapLead.get(leadRecord.Id)?.IsConverted != leadRecord.IsConverted) {
+
+                    //* collect all the accountIds for the lead record
+                    setAccId.add(leadRecord.ConvertedAccountId);
+                }
+            }
+        }
+        //* collect the list of opportunities to update
+        List<Opportunity> listOpportunityToUpdate = new List<Opportunity>();
+
+        //* Query the opportunity related to accountId to update the stage name
+        if(setAccId?.size() > 0) {
+            for(Opportunity oppRecord : [SELECT Id FROM Opportunity WHERE AccountId IN: setAccId WITH USER_MODE LIMIT 50000]) {
+
+                Opportunity opp = new Opportunity();
+                opp.Id          = oppRecord.Id;
+                opp.StageName   = 'Qualification';
+
+                listOpportunityToUpdate.add(opp);
+            }
+        }
+
+        if(listOpportunityToUpdate?.size()> 0) {
+
+            ErrorHandler.handleUpdateExceptions(listOpportunityToUpdate);
         }
     }
 }

@@ -2,11 +2,63 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 01-14-2025
+ * @last modified on  : 03-06-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class OpportunityTriggerHelper {
+        //* Update Highest Amount field on opportunity
+        public static void updateHighestAmount(List<Opportunity> newOpportunities) {
 
+            //* Map of AccountId for the opportunities
+            Map<Id,Opportunity> accountIdKeyMap = new Map<Id,Opportunity>();
+
+            //* Map existing opp with AccountId key
+            Map<Id,Decimal> existingOppAccountIdkey = new Map<Id,Decimal>();
+            
+            if (newOpportunities?.size() > 0) {
+                //* loop through the opp records to collect accountId
+                for (Opportunity newOppRecord : newOpportunities) {
+                    
+                    if (newOppRecord.Amount != null) {
+                        accountIdKeyMap.put(newOppRecord.AccountId, newOppRecord);
+                    }
+                }
+            }
+
+            //* Query the max existing opprtunity value
+            if (accountIdKeyMap?.size() > 0) {
+                
+                List<AggregateResult> listAggResults = [SELECT MAX(Amount) heighest, AccountId accId FROM Opportunity WHERE AccountId IN : accountIdKeyMap.keySet() WITH USER_MODE GROUP BY AccountId LIMIT 50000];
+
+                if (listAggResults?.size() > 0) {
+                    
+                    for (AggregateResult aggRecord : listAggResults) {
+                        
+                        Decimal oldHeighest = (Decimal) aggRecord.get('heighest');
+                        String idAccount    = (String) aggRecord.get('accId');
+
+                        existingOppAccountIdkey.put(idAccount, oldHeighest);
+                    }
+                }
+            }
+
+            //* check the condition to update the opp
+            if (existingOppAccountIdkey?.size() > 0) {
+                
+                for (Opportunity newOppRecords : newOpportunities) {
+                    
+                    if (existingOppAccountIdkey.containsKey(newOppRecords.AccountId)) {
+                        
+                        newOppRecords.Highest_Amount__c = existingOppAccountIdkey.get(newOppRecords.AccountId) < newOppRecords.Amount ? true : false; 
+
+                    } else {
+                        
+                        newOppRecords.Highest_Amount__c = true;
+                    }
+                }
+            }
+
+        } 
          //* Update the trigger Amount field
         public static void updateTriggerAmount(List<Opportunity> newOpportunities, Map<Id, Opportunity> oldMapOpportunities) {
                 
@@ -14,7 +66,7 @@ public with sharing class OpportunityTriggerHelper {
 
                 for (Opportunity opportunityRecord : newOpportunities) {
                         //* condition to check the opp stage is Modified
-                        if (opportunityRecord.StageName != oldMapOpportunities.get(opportunityRecord.Id).StageName) {
+                        if (opportunityRecord.StageName != oldMapOpportunities.get(opportunityRecord.Id).StageName && opportunityRecord.Amount != null) {
                             opportunityRecord.Amount  = (opportunityRecord.Probability * opportunityRecord?.ExpectedRevenue);
                             opportunityRecord.Description = 'Updated From Trigger';
                         }

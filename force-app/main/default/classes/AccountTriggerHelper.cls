@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 01-15-2025
+ * @last modified on  : 05-05-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class AccountTriggerHelper {
@@ -151,14 +151,14 @@ public with sharing class AccountTriggerHelper {
                             listContacts.add(contactRecord);
                         }
                     }
-                }
+                }   
             //* Insert the list of contacts
             
                 if (listContacts.size() > 0) {
                     ErrorHandler.handleInsertExceptions(listContacts);
                 }
         }    
-    //! Method to delete contacts from account
+    //* Method to delete contacts from account
         public static void deleteNContactsFromAccount(Map<Id,Integer> accIdMapNumberContactDelete) {
             
             //* Map AccountId and its contacts 
@@ -272,6 +272,41 @@ public with sharing class AccountTriggerHelper {
                         accountRecord.addError('You can\'t delete account');
                     }
                 }
+            }
+        }
+    //* Method to verify if we can call Batch apex from Trigger
+        public static void batchJobExecution() {
+            BatchApex callBatch = new BatchApex('Future Apex');
+            Id jobId = Database.executeBatch(callBatch);
+            
+        }
+    //* Method to share the account record with secondary user
+        public static void shareAccountRecordToSecondaryUser(Map<Id,Account> newMapAccounts) {
+            //* List of account share to collect
+            List<AccountShare> accShareRecordList = new List<AccountShare>();
+
+            if (newMapAccounts?.size() > 0) {
+                
+                //* Query to get the user details from account Id
+                for (Account accRecord : newMapAccounts.values()) {
+                    
+                    if (String.isNotBlank(accRecord.Secondary_Owner__c)) {
+                        
+                        AccountShare accShareRecord           = new AccountShare();
+                        accShareRecord.AccountId              = accRecord.Id;
+                        accShareRecord.RowCause               = 'Manual';
+                        accShareRecord.AccountAccessLevel     = 'Edit';
+                        accShareRecord.OpportunityAccessLevel = 'Edit';
+                        accShareRecord.ContactAccessLevel     = 'Read';
+                        accShareRecord.UserOrGroupId          = accRecord.Secondary_Owner__c;
+                        accShareRecordList.add(accShareRecord);
+                    }
+
+                }
+            }
+            //* check insert the accountshare records
+            if (accShareRecordList?.size() > 0) {
+                ErrorHandler.handleInsertExceptions(accShareRecordList);
             }
         }
 }

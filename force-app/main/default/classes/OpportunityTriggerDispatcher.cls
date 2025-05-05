@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 01-14-2025
+ * @last modified on  : 03-01-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class OpportunityTriggerDispatcher {
@@ -10,7 +10,7 @@ public with sharing class OpportunityTriggerDispatcher {
 
         switch on triggerOperationType {
             when BEFORE_INSERT {
-                
+                OpportunityTriggerHandler.handleBeforeInsert(Trigger.new);
             }
             when BEFORE_UPDATE {
                 OpportunityTriggerHandler.handleBeforeUpdate(Trigger.new, (Map<Id, Opportunity>)Trigger.oldMap);

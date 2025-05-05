@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 01-11-2025
+ * @last modified on  : 03-06-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class LeadTriggerDispatcher {
@@ -23,7 +23,7 @@ public with sharing class LeadTriggerDispatcher {
             WHEN AFTER_INSERT {
             }
             When AFTER_UPDATE {
-    
+                LeadTriggerHandler.updateOpportunityStageNameConvertedLead((Map<Id,Lead>) Trigger.newMap, (Map<Id,Lead>) Trigger.oldMap);
             }
             When AFTER_DELETE {
     

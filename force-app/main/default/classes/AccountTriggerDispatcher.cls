@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 01-10-2025
+ * @last modified on  : 03-20-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class AccountTriggerDispatcher {
@@ -11,7 +11,7 @@ public with sharing class AccountTriggerDispatcher {
 
         switch on operationType {
             WHEN BEFORE_INSERT {
-            
+                AccountTriggerHandler.handleBeforeInsert(Trigger.new);
             }
             When BEFORE_UPDATE {
                 AccountTriggerHandler.handleBeforeUpdate(Trigger.new, (Map<Id, Account>) Trigger.oldMap);
