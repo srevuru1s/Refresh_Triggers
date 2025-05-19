@@ -1,1 +1,2 @@
-SELECT Id, Secondary_Owner__c,  Secondary_Owner__r.Name, Secondary_Owner__r.Email, Secondary_Owner__r.Id FROM Account WHERE Id = '001aj000010ipuMAAQ'
+SELECT Id, Name, Asset__c, Asset__r.Account.Name, Asset__r.Account.Active_Marketplace__c, Asset__r.AccountId 
+  FROM Market_Place__c

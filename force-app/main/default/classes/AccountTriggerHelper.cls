@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 05-05-2025
+ * @last modified on  : 05-06-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class AccountTriggerHelper {
@@ -277,7 +277,7 @@ public with sharing class AccountTriggerHelper {
     //* Method to verify if we can call Batch apex from Trigger
         public static void batchJobExecution() {
             BatchApex callBatch = new BatchApex('Future Apex');
-            Id jobId = Database.executeBatch(callBatch);
+            Id jobId = Database.executeBatch(callBatch); 
             
         }
     //* Method to share the account record with secondary user
