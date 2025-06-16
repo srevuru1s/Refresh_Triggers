@@ -2,11 +2,45 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-23-2024
+ * @last modified on  : 05-23-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class SubscriptionTriggerHelper {
     
+    //* Deselect the old Subscriber Recent check box and add for the new one
+    public static void verifyRecentCheckBoxField(List<Subscription__c> newSubscriptions) {
+
+        //* Collect the account Id for the sub
+        Map<Id,Subscription__c> mapAccountIdSub = new Map<Id,Subscription__c>();
+        //*List of sub's toupdate
+        List<Subscription__c> listSubToUpdated = new List<Subscription__c>();
+
+        if (newSubscriptions?.size() > 0) {
+            //* loop through the records to collect the account Id and verify the recent field
+            for (Subscription__c subRecord : newSubscriptions) {
+                
+                if (subRecord.Recent__c != true && String.isNotBlank(subRecord.Account_Name__c)) {
+                    
+                    subRecord.Recent__c = true;
+                }
+                mapAccountIdSub.put(subRecord.Account_Name__c, subRecord);
+            }
+        }
+
+        if (mapAccountIdSub?.size() > 0) {
+            //*Query the account and related sub records 
+
+            for (Subscription__c subRecord : [SELECT Id FROM Subscription__c WHERE Recent__c = true AND Account_Name__c IN :mapAccountIdSub.keySet()  WITH USER_MODE LIMIT 50000]) {
+                
+                Subscription__c updateSub = new Subscription__c(Id = subRecord.Id, Recent__c = false);
+                listSubToUpdated.add(updateSub);
+            }
+        }
+
+        if (listSubToUpdated?.size() > 0) {
+            ErrorHandler.handleUpdateExceptions(listSubToUpdated);
+        }
+    }
     public static void createFeatureRecords(List<Subscription__c> newSubscriptions, Map<Id, Subscription__c> newMapSubscriptions) {
 
         //* collect the Map of Feature records to be inserted
@@ -217,4 +251,42 @@ public with sharing class SubscriptionTriggerHelper {
         }
     }
     
+    public static void afterDeleteUpdateSubRecord(Map<Id,Subscription__c> mapOfSubscriptions) {
+    
+        //* Collect the account Id for the sub
+        Map<Id,Subscription__c> mapAccountIdSub = new Map<Id,Subscription__c>();
+        //* collect the Map of subs to get updated
+        Map<Id,Subscription__c> mapSubsToUpdate = new Map<Id,Subscription__c>();
+
+        if (mapOfSubscriptions?.size() > 0) {
+            
+            //* get the account id from  the subs
+            //* loop through the records to collect the account Id and verify the recent field
+            for (Subscription__c subRecord : mapOfSubscriptions.values()) {
+                
+                if (subRecord.Recent__c == true && String.isNotBlank(subRecord.Account_Name__c)) {
+                    
+                    mapAccountIdSub.put(subRecord.Account_Name__c, subRecord);
+                }
+            }
+        }
+        if (mapAccountIdSub?.size() > 0) {
+            //* Query the latest sub to update the Recent field
+            for(Subscription__c subRecord : [SELECT Id, Account_Name__c FROM Subscription__c WHERE Account_Name__c IN: mapAccountIdSub.keySet() AND Id NOT IN: mapOfSubscriptions.keySet() WITH USER_MODE
+                                                        ORDER BY Id DESC LIMIT 50000]) {
+                
+                //* check the map if it got the sub record or not?
+                if (!mapSubsToUpdate?.containsKey(subRecord.Account_Name__c)) {
+                    subRecord.Recent__c = true;
+                    mapSubsToUpdate.put(subRecord.Account_Name__c, subRecord);
+                }
+                
+            }
+        }
+
+        if (mapSubsToUpdate?.size() > 0) {
+            ErrorHandler.handleUpdateExceptions(mapSubsToUpdate.values());
+        }
+    
+    }
 }

@@ -2,10 +2,10 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 03-20-2025
+ * @last modified on  : 06-11-2025
  * @last modified by  : sagar@salesforce.learning
 **/
-public with sharing class BatchApex implements Database.Batchable<sObject>, Database.AllowsCallouts, Database.stateful, Schedulable{
+global with sharing class BatchApex implements Database.Batchable<sObject>, Database.AllowsCallouts, Database.stateful, Schedulable{
 
     public String filterField; //* Class variable
     //* Constructor 
@@ -29,8 +29,16 @@ public with sharing class BatchApex implements Database.Batchable<sObject>, Data
         if (sObjectList?.size() > 0) {
             for (sObject accRecord : sObjectList) {
                 
-                Account acc = new Account(Id = accRecord.Id, Async_Apex__c = 'Batch Apex');
-                listAllRecords.add(acc);
+                Schema.SObjectType typeOfSObject = accRecord.getSObjectType();
+                
+                if(typeOfSObject == Account.SObjectType) {
+
+                    Account myAcc = (Account) accRecord;
+                    myAcc.Async_Apex__c = 'Future Apex';
+                    //Account acc = new Account(Id = accRecord.Id, Async_Apex__c = 'Future Apex');
+                    listAllRecords.add(myAcc);
+                }
+
             }
         }
 
@@ -47,7 +55,7 @@ public with sharing class BatchApex implements Database.Batchable<sObject>, Data
         System.debug('The batch Id has been completed :' + batchContext.getJobId());
     }
 
-    public void execute(System.SchedulableContext sc) {
+    global void execute(System.SchedulableContext sc) {
         Id BatchJobId = Database.executeBatch(new BatchApex('Batch Apex'), 10);
     }
     //* Fianlly after a gap

@@ -1,0 +1,37 @@
+<!--
+  @description       : 
+  @author            : sagar@salesforce.learning
+  @group             : 
+  @last modified on  : 06-03-2025
+  @last modified by  : sagar@salesforce.learning
+-->
+<template>
+    <lightning-card  variant="Brand"  title="Lightning Record From" icon-name="standard:account">
+        <lightning-record-form
+            columns={columns}
+            layout-type="Compact"
+            object-api-name={objectApiName}
+            record-id={recordId}
+            fields={fields}
+            onsuccess={successHandler}
+        ></lightning-record-form>
+        <lightning-record-edit-form
+            record-id="001aj000014ZsFdAAK"
+            object-api-name="Account">
+        <lightning-messages> </lightning-messages>
+        <lightning-output-field field-name="Id">
+        </lightning-output-field>
+        <lightning-input-field field-name="AccountNumber"> </lightning-input-field>
+        <lightning-input-field field-name="Rating"> </lightning-input-field>
+        <lightning-input-field field-name="Industry"> </lightning-input-field>
+        <lightning-button
+            class="slds-m-top_small"
+            variant="brand"
+            type="submit"
+            name="update"
+            label="Update"
+        >
+        </lightning-button>
+    </lightning-record-edit-form>
+    </lightning-card> 
+</template>

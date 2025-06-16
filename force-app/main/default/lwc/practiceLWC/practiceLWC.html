@@ -1,0 +1,37 @@
+<!--
+  @description       : 
+  @author            : sagar@salesforce.learning
+  @group             : 
+  @last modified on  : 06-03-2025
+  @last modified by  : sagar@salesforce.learning
+-->
+<template>
+    <lightning-card  variant="Narrow"  title="LWC Practice" icon-name="standard:account">
+        <div class="slds-var-m-around_small">
+            <lightning-input lwc:ref="input" type="text" variant="standard" label="Enter Your Name" placeholder="type here..." onkeyup={onkeyHandler}></lightning-input>
+            <p>This is the static info from JS : {motoofToday} </p>
+            <p>This is the static info from JS : {dataFromHtml} </p>
+        </div>
+
+        <template for:each={arrayValues} for:item="item">
+            <div key={item} class="slds-var-m-around_small">
+                {item}
+            </div>
+        </template>
+
+        <lightning-button variant='brand' label='Track@' title='test Track' onclick={handleTrack}>
+        </lightning-button>
+        <div class="slds-var-m-around_small" title="Object Render">
+            <P> Sagar Object Details : {objectDetails.Name} , {objectDetails.Phone}, {objectDetails.City}</P>
+            <template lwc:if={objectDetails.Location}>
+                <p>{objectDetails.Location}</p>
+            </template>
+        </div>
+    </lightning-card>
+    <lightning-card variant="Narrow"  title="LWC child component" icon-name="standard:account">
+        <c-practice-child-l-w-c parentinfo = {sendDetailsToChild} onchilddata = {childCloseHandler}>
+            <p slot="first"> This is the first slot1</p>
+            <p slot="second"> This is the first slot2</p>
+        </c-practice-child-l-w-c>
+    </lightning-card>
+</template>

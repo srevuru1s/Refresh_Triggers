@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 12-22-2024
+ * @last modified on  : 05-21-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class SubscriptionTriggerDispatcher {
@@ -25,10 +25,10 @@ public with sharing class SubscriptionTriggerDispatcher {
                 SubscriptionTriggerHandler.handleAfterUpdate((Map<Id,Subscription__c>) Trigger.newMap, (Map<Id,Subscription__c>) Trigger.oldMap);
             }
             When AFTER_DELETE {
-    
+                SubscriptionTriggerHandler.handleAfterDelete((Map<Id,Subscription__c>) Trigger.oldMap);
             }
             When AFTER_UNDELETE {
-    
+                
             }
             
         }

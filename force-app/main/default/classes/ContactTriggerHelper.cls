@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 01-11-2025
+ * @last modified on  : 06-11-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ContactTriggerHelper {
@@ -450,5 +450,26 @@ public with sharing class ContactTriggerHelper {
             }
         }
     } 
+    //* Update account with all the contact First and Last Name
+    public static void updateAccountContactsField(Map<Id,Contact> newMapContacts) {
+        
+        //* Collect account Ids
+        List<Account> listAccount = new List<Account>();
 
+        if (newMapContacts?.size() > 0) {
+            
+            for (Contact contactRecord : newMapContacts.values()) {
+                
+                Account updateAccount = new Account(Id = contactRecord.AccountId);
+                updateAccount.Contact_Names__c += contactRecord.FirstName + contactRecord.LastName;
+                
+                listAccount.add(updateAccount);
+            }
+        }
+        //* Create a new account instance to update the account
+        if (listAccount?.size() > 0) {
+            
+            ErrorHandler.handleUpdateExceptions(listAccount);
+        }
+    }
 }

@@ -1,0 +1,28 @@
+<!--
+  @description       : 
+  @author            : sagar@salesforce.learning
+  @group             : 
+  @last modified on  : 06-01-2025
+  @last modified by  : sagar@salesforce.learning
+-->
+<template>
+    <lightning-card  variant="Narrow"  title="Child Component" icon-name="standard:account">
+        <template lwc:if={daughterdetails}>
+            <p> My Daugheter Name : {daughterdetails.Name}</p>
+            <p> My Daugheter Name : {daughterdetails.Color}</p>
+            <p> My Daugheter Name : {daughterdetails.Dad}</p>
+        </template>
+        <template lwc:if={arryDetails}>
+            <p>Array Detatils {arryDetails}</p>
+        </template>
+        <div class="slds-var-m-around_small">
+            <slot name="first"></slot>
+            <slot name="second"></slot>
+        </div>
+        
+        <lightning-button variant='brand' label='Child to Parent' title='title' onclick={handleChildClick} class='cssClass'>
+        </lightning-button>
+        <lightning-button variant='brand' label='Second Child Button' title='title' onclick={handlesecondChildClick} class='cssClass'>
+        </lightning-button>
+    </lightning-card>
+</template>
