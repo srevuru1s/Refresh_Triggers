@@ -2,13 +2,14 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 03-01-2025
+ * @last modified on  : 09-10-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class OpportunityTriggerHandler {
     //* Handle Before Insert
     public static void handleBeforeInsert(List<Opportunity> newOpportunities) {
         OpportunityTriggerHelper.updateHighestAmount(newOpportunities);
+        OpportunityTriggerHelper.splitAccountAmountToNewOpportunitiesEvenly(newOpportunities);
     }
     //* Handle Before Update
 
@@ -88,5 +89,6 @@ public with sharing class OpportunityTriggerHandler {
     //* Handle After Insert
     public static void handleAfterInsert(List<Opportunity> newOpportunities, Map<Id,Opportunity> newMapOpportunities) {
         OpportunityTriggerHelper.updateAccountWithHighestOpportunity(newOpportunities, newMapOpportunities);
+       // OpportunityTriggerHelper.splitAccountAmountToOldOpportunitiesEvenly(newMapOpportunities);
     }
 }

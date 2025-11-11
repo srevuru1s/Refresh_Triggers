@@ -1,2 +1,2 @@
-SELECT Id, Name, Asset__c, Asset__r.Account.Name, Asset__r.Account.Active_Marketplace__c, Asset__r.AccountId 
-  FROM Market_Place__c
+SELECT Id, JobType
+  FROM AsyncApexJob

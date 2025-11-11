@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 06-11-2025
+ * @last modified on  : 07-15-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class ContactTriggerHelper {
@@ -450,26 +450,44 @@ public with sharing class ContactTriggerHelper {
             }
         }
     } 
-    //* Update account with all the contact First and Last Name
+    //* Update account with all the contact First and Last Name 
+    
     public static void updateAccountContactsField(Map<Id,Contact> newMapContacts) {
         
         //* Collect account Ids
+        Map<Id,Contact> mapAccountIdWithContact = new Map<Id,Contact>();
+
         List<Account> listAccount = new List<Account>();
+
 
         if (newMapContacts?.size() > 0) {
             
             for (Contact contactRecord : newMapContacts.values()) {
                 
-                Account updateAccount = new Account(Id = contactRecord.AccountId);
-                updateAccount.Contact_Names__c += contactRecord.FirstName + contactRecord.LastName;
-                
-                listAccount.add(updateAccount);
+                mapAccountIdWithContact.put(contactRecord.AccountId, contactRecord);
             }
         }
-        //* Create a new account instance to update the account
-        if (listAccount?.size() > 0) {
+        //* Query the account field if it has any old contacts associated with it
+        if (mapAccountIdWithContact?.size() > 0) {
             
-            ErrorHandler.handleUpdateExceptions(listAccount);
+            Map<Id,Account> accountMapDetails = new Map<Id,Account>([SELECT Id,Contact_Names__c FROM Account WHERE Id IN: mapAccountIdWithContact.keySet() WITH USER_MODE LIMIT 50000]);
+            
+            for (Contact newConRecord : newMapContacts.values()) {
+                
+                if (accountMapDetails.containsKey(newConRecord.AccountId) && !String.isEmpty(accountMapDetails.get(newConRecord.AccountId).Contact_Names__c)) {
+                    
+                    accountMapDetails.get(newConRecord.AccountId).Contact_Names__c += ' '+newConRecord.FirstName +' '+ newConRecord.LastName; 
+                } else {
+                    accountMapDetails.get(newConRecord.AccountId).Contact_Names__c = newConRecord.FirstName + ' ' + newConRecord.LastName;
+                }
+            }
+
+            //* Create a new account instance to update the account
+                if (accountMapDetails?.size() > 0) {
+                    
+                    ErrorHandler.handleUpdateExceptions(accountMapDetails.values());
+                }
         }
+
     }
 }

@@ -1,0 +1,15 @@
+<!--
+  @description       : 
+  @author            : sagar@salesforce.learning
+  @group             : 
+  @last modified on  : 07-17-2025
+  @last modified by  : sagar@salesforce.learning
+-->
+<template>
+    <lightning-card  variant="Narrow"  title="Nasa Image of the day" icon-name="standard:account">
+        <p>APOD</p>
+        <lightning-input type='date' label='Enter the date of Image' onchange={dataChangeHandler}>
+        </lightning-input>
+        <img src={imageURL}>
+    </lightning-card>
+</template>

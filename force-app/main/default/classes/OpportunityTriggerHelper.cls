@@ -1,8 +1,8 @@
-    /**
+/**
  * @description       : 
  * @author            : sagar@salesforce.learning
  * @group             : 
- * @last modified on  : 03-06-2025
+ * @last modified on  : 09-30-2025
  * @last modified by  : sagar@salesforce.learning
 **/
 public with sharing class OpportunityTriggerHelper {
@@ -204,4 +204,86 @@ public with sharing class OpportunityTriggerHelper {
                 ErrorHandler.handleUpdateExceptions(accountListToUpdate);
             }
         }
+        //* Spliting Account Amount evenly to newly created opportunities
+        public static List<Opportunity> splitAccountAmountToNewOpportunitiesEvenly(List<Opportunity> newOpportunities) {
+
+            //* collect opportunity and amount
+            Integer totalNumberOfOpps = 1;
+            Decimal amountFromAccount;
+
+            //* List of Opportunities that need to update
+            List<Opportunity> oldOppListToUpdate = new List<Opportunity>();
+
+            //* collect the account Id associated to the new opportunity
+            Map<Id,Opportunity> mapOfAccIdKeyOpportunity = new Map<Id, Opportunity>();
+
+            //* check the newOpportunities list 
+            if(newOpportunities?.size() > 0) {
+                for (Opportunity newOpps : newOpportunities) {
+                    //* check the condition opp has associated account
+                    if (newOpps?.AccountId != null) {
+                        
+                        mapOfAccIdKeyOpportunity.put(newOpps.AccountId, newOpps);
+                    }
+                }
+            }
+            //*Query the account record Amount that need to be split amoung all opps equally
+            if (mapOfAccIdKeyOpportunity?.size() > 0) {
+                
+                //* collect account Id and its number of opportunities
+                Map<Id,Integer> mapOfAccIdKeyToNumberOpportunities = new Map<Id, Integer>();
+                Map<Id,Account> accountDetails = new Map<Id,Account> ([SELECT Id, Opportunity_Split__c FROM Account WHERE Id IN: mapOfAccIdKeyOpportunity.keySet() AND Opportunity_Split__c != NULL WITH USER_MODE LIMIT 50000]);
+                
+                if (accountDetails?.size() > 0) {
+                    
+                    //* count the number of existing opportunities
+                    List<AggregateResult> oppAggRecords = [SELECT COUNT(ID) numberOfOpps, AccountId accId  FROM Opportunity WHERE AccountId IN: accountDetails.keySet()  WITH USER_MODE GROUP BY AccountId LIMIT 50000];
+                        
+                        if (oppAggRecords?.size() > 0) {
+
+                            for (AggregateResult oppAggRec : oppAggRecords) {
+                                
+                                Integer totalOpps = (Integer) oppAggRec.get('numberOfOpps');
+                                String accId      = (String) oppAggRec.get('accId');
+
+                                mapOfAccIdKeyToNumberOpportunities.put(accId, totalOpps);
+        
+                            }
+                            //*Query the old opportunities associated to account that need to be updated too
+                            
+                            oldOppListToUpdate = ( [SELECT Id FROM Opportunity WHERE AccountId IN : accountDetails.keySet() WITH USER_MODE LIMIT 50000] );
+                            
+                        }
+                }
+                //* Loop through the new opp records to update the field
+                if (mapOfAccIdKeyOpportunity?.size() > 0) {
+                    
+                    for (Opportunity newOppRec : mapOfAccIdKeyOpportunity.values()) {
+                        
+                        //* Just to validate the information
+                        totalNumberOfOpps += mapOfAccIdKeyToNumberOpportunities?.get(newOppRec.AccountId);
+                        amountFromAccount = accountDetails?.get(newOppRec.AccountId)?.Opportunity_Split__c;
+
+                        newOppRec.Opportunity_Share__c = (amountFromAccount/totalNumberOfOpps);     
+                        
+                    }
+                }
+                //* Loop through the old opps to update the value
+                if (oldOppListToUpdate?.size() > 0) {
+                    
+                    for (Opportunity oldOpp : oldOppListToUpdate) {
+                        
+                        oldOpp.Opportunity_Share__c = (amountFromAccount/totalNumberOfOpps);
+                        
+                    }
+                    //* update the old opportunities 
+                    ErrorHandler.handleUpdateExceptions(oldOppListToUpdate);
+                }
+
+            }
+
+            return oldOppListToUpdate;
+            
+        }
+
 }
