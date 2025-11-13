@@ -1,0 +1,24 @@
+<!--
+  @description       : 
+  @author            : sagar@salesforce.learning
+  @group             : 
+  @last modified on  : 11-11-2025
+  @last modified by  : sagar@salesforce.learning
+-->
+<template>
+    <lightning-card title="Hello World Demo" icon-name="custom:custom14">
+        <div class="slds-p-around_medium">
+            <lightning-button
+                label="Show Hello"
+                variant="brand"
+                onclick={handleClick}
+            ></lightning-button>
+
+            <template if:true={showMessage}>
+                <p class="slds-m-top_medium slds-text-heading_small">
+                    Hello, World!
+                </p>
+            </template>
+        </div>
+    </lightning-card>
+</template>

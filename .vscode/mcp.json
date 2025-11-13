@@ -1,0 +1,18 @@
+{
+    "servers": {
+        "salesforce-dx": {
+        "timeout": 60,
+        "type": "stdio",
+        "command": "npx",
+        "args": [
+            "-y",
+            "@salesforce/mcp",
+            "--orgs",
+            "cursorProject",
+            "--toolsets",
+            "all"
+        ]
+        }
+    }
+    
+}
